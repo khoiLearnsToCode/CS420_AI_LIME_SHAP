@@ -7,13 +7,22 @@ Thực nghiệm so sánh hai phương pháp giải thích mô hình **LIME** và
 ```
 AI Seminar/
 ├── S04_LIME_SHAP_experiments.ipynb   # notebook thực nghiệm chính
-├── S04_Seminar_LIME.pdf              # slide seminar
-├── 1705.07874v2.pdf                  # tài liệu tham khảo (bài báo)
-├── 2409.00265v2.pdf                  # tài liệu tham khảo (bài báo)
-├── 2939672.2939778.pdf               # tài liệu tham khảo (bài báo)
-├── figs/                             # hình sinh ra khi chạy notebook
-└── results/                          # bảng CSV sinh ra khi chạy notebook
+├── S04_Seminar_LIME.pdf              # đề bài seminar S04 (yêu cầu + rubric)
+├── Report.tex                        # mã nguồn LaTeX của báo cáo (biên dịch bằng XeLaTeX)
+├── Report.pdf                        # báo cáo của nhóm (10 trang nội dung + tài liệu tham khảo + phụ lục)
+├── figs_en/                          # hình dùng trong báo cáo (nhãn tiếng Anh)
+├── results/                          # bảng CSV sinh ra khi chạy notebook
+└── references/
+    ├── 2939672.2939778.pdf           # Ribeiro et al. (2016) – LIME (bắt buộc)
+    ├── 1705.07874v2.pdf              # Lundberg & Lee (2017) – SHAP (bắt buộc)
+    ├── 2409.00265v2.pdf              # Mersha et al. (2024) – survey XAI (khuyến nghị)
+    ├── *.md                          # ghi chú giải thích LIME/SHAP
+    └── figs/                         # hình cũ (nhãn tiếng Việt), gồm cả deletion_test.png
 ```
+
+Khi chạy, notebook ghi hình vào `figs/` (thư mục này được tạo tự động và không có sẵn trong repo). Các hình trong `figs_en/` là bản nhãn tiếng Anh dùng cho báo cáo. Hình deletion test trong báo cáo được vẽ bằng pgfplots từ số liệu của `results/deletion_curves.csv`, nên không cần file ảnh.
+
+Để build lại báo cáo: `xelatex Report.tex` (chạy 2 lần để cập nhật tham chiếu chéo).
 
 ## Cài đặt
 
@@ -64,7 +73,7 @@ Các tham số (seed, số mẫu nhiễu, số background...) nằm trong dict `
 
 ## Kết quả đầu ra
 
-**`figs/`**
+**`figs/`** (tạo khi chạy notebook)
 - `contrib_LogReg.png`, `contrib_RandomForest.png`: đóng góp đặc trưng của LIME và SHAP cho 3 mẫu
 - `unstable_example.png`: ví dụ giải thích bất ổn
 - `deletion_test.png`: đường cong deletion test
