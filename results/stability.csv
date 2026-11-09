@@ -1,0 +1,7 @@
+mô hình,mẫu,Jaccard LIME,top-1 chiếm ưu thế LIME,Jaccard SHAP,top-1 chiếm ưu thế SHAP
+LogReg,đúng chắc chắn,0.78,0.95,0.68,0.4
+LogReg,sát ranh giới,0.84,1.0,0.73,1.0
+LogReg,dự đoán sai,0.85,1.0,0.53,1.0
+RandomForest,đúng chắc chắn,0.94,0.6,1.0,1.0
+RandomForest,sát ranh giới,0.72,0.8,0.73,1.0
+RandomForest,dự đoán sai,0.74,1.0,1.0,1.0
