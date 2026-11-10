@@ -586,18 +586,18 @@ Both LIME and SHAP lower the probability much faster than random removal. After 
 \label{sec:causal}
 LIME and SHAP describe how the \emph{model} uses its features, not how those
 features affect the \emph{disease}: a large contribution means the model
-relies on a feature, not that it causes malignancy. Four reasons, each visible
-in our experiment, keep the two apart.
+relies on a feature, not that it causes malignancy. Four reasons, each visible in our experiment, show why the two should not be confused.
 
 \begin{itemize}
   \item \textbf{Correlated features.} Worst radius, perimeter and area grow
         together and all appear near the top of the charts; how the credit is
         split among them depends on the model and the background data, not on
         which one is the real cause.
-  \item \textbf{Unrealistic samples.} Both methods change each feature
-        independently (for KernelSHAP, the independence assumption of
-        Section~\ref{sec:shap}), creating combinations that never occur in
-        real tumours, such as a large area with a small radius.
+  \item \textbf{Unrealistic samples.} Both LIME and KernelSHAP change each feature 
+        independently of the others; for KernelSHAP this is the feature-independence 
+        assumption described in Section~\ref{sec:shap}. This creates combinations that never occur 
+        in real tumours, such as a large area with a small radius, so the model is 
+        queried in regions where it has never seen data.
   \item \textbf{Explanations also reflect the model's mistakes.} On the
         misclassified instance (Section~\ref{sec:wrong}) the size features
         explain why the model erred, not that the tumour is malignant.
