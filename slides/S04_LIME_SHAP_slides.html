@@ -1,0 +1,1036 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LIME and SHAP Seminar</title>
+
+<!-- Fonts: Newsreader (headlines) + IBM Plex Sans (body, tables) -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=Newsreader:ital,opsz,wght@0,6..72,400..600;1,6..72,400..500&display=swap">
+
+<!-- KaTeX for equations (pinned version) -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+
+<style>
+/* ===========================================================
+   THEME TOKENS
+   Change colours / fonts here to restyle the whole deck.
+   LIME = orange, SHAP = blue everywhere (same as the report figures).
+   =========================================================== */
+:root {
+    --paper:   #FFFFFF;
+    --rail:    #F2F5F9;   /* margin column + equation boxes */
+    --ink:     #13294B;   /* navy: headings and body text */
+    --ink-2:   #4A5B74;   /* slate: secondary text */
+    --ink-3:   #66758B;   /* muted: folios, axis text */
+    --rule:    #D3DBE6;   /* hairlines */
+    --lime:    #E07B00;   /* LIME marks */
+    --lime-ink:#A35700;   /* LIME text (passes contrast) */
+    --shap:    #2C6DB0;   /* SHAP marks */
+    --shap-ink:#245C96;
+    --random:  #8C96A3;
+
+    --serif: 'Newsreader', Georgia, 'Times New Roman', serif;
+    --sans:  'IBM Plex Sans', 'Segoe UI', Helvetica, Arial, sans-serif;
+
+    --stage-bg: #0E1626;  /* letterbox around the 16:9 stage */
+    --slide-bg: #FFFFFF;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+/* ===========================================================
+   FIXED 16:9 STAGE (viewport-base.css, included in full)
+   =========================================================== */
+html, body { width: 100%; height: 100%; margin: 0; overflow: hidden; background: var(--stage-bg, #000); }
+.deck-viewport { position: fixed; inset: 0; overflow: hidden; background: var(--stage-bg, #000); }
+.deck-stage { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; overflow: hidden; transform-origin: 0 0; background: var(--slide-bg, #fff); }
+.slide { position: absolute; inset: 0; width: 1920px; height: 1080px; overflow: hidden; display: block; visibility: hidden; opacity: 0; pointer-events: none; background: var(--slide-bg, #fff); }
+.slide.active, .slide.visible { visibility: visible; opacity: 1; pointer-events: auto; z-index: 1; }
+img, video, canvas, svg { max-width: 100%; max-height: 100%; }
+.deck-controls { position: fixed; left: 50%; bottom: 22px; transform: translateX(-50%); z-index: 1000; }
+@media print {
+    html, body { width: 1920px; height: auto; overflow: visible; background: #fff; }
+    .deck-viewport { position: static; overflow: visible; background: #fff; }
+    .deck-stage { position: static; width: auto; height: auto; transform: none !important; background: none; }
+    .slide { position: relative; display: block !important; visibility: visible !important; opacity: 1 !important; pointer-events: auto !important; width: 1920px; height: 1080px; break-after: page; page-break-after: always; }
+    .slide:last-child { break-after: auto; page-break-after: auto; }
+    .deck-controls { display: none !important; }
+}
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.2s !important; }
+}
+
+/* ===========================================================
+   BASE TYPOGRAPHY
+   =========================================================== */
+body { font-family: var(--sans); color: var(--ink); -webkit-font-smoothing: antialiased; }
+.slide { transition: opacity .35s ease, visibility .35s; font-family: var(--sans); color: var(--ink); }
+b, strong { font-weight: 600; }
+.num { font-variant-numeric: tabular-nums; }
+.lime-t { color: var(--lime-ink); font-weight: 600; }
+.shap-t { color: var(--shap-ink); font-weight: 600; }
+.katex { font-size: 1.06em; }
+
+/* ===========================================================
+   CONTENT SLIDE FRAME
+   .rail  = margin column: talk outline + source citation
+   .body  = headline + evidence
+   =========================================================== */
+.rail {
+    position: absolute; left: 0; top: 0; width: 300px; height: 1080px;
+    background: var(--rail);
+    padding: 92px 36px 56px 60px;
+    display: flex; flex-direction: column; justify-content: space-between;
+}
+.outline { list-style: none; display: flex; flex-direction: column; gap: 14px; }
+.outline li { font: 400 23px/1.2 var(--sans); color: var(--ink-3); }
+.outline li.on { color: var(--ink); font-weight: 600; }
+.outline li.on::before { content: ""; display: inline-block; width: 14px; height: 3px; background: var(--ink); vertical-align: middle; margin: 0 10px 4px -24px; }
+.source { font: 400 21px/1.45 var(--sans); color: var(--ink-2); }
+.source b { display: block; font-weight: 600; color: var(--ink); margin-bottom: 4px; }
+
+.body {
+    position: absolute; left: 380px; top: 86px; width: 1420px; height: 900px;
+    display: flex; flex-direction: column; gap: 44px;
+}
+.headline {
+    font: 500 60px/1.1 var(--serif); font-variation-settings: 'opsz' 72;
+    letter-spacing: -0.012em; color: var(--ink); max-width: 1360px; text-wrap: balance;
+}
+.folio { position: absolute; right: 120px; bottom: 50px; font: 500 22px var(--sans); color: var(--ink-3); font-variant-numeric: tabular-nums; }
+
+p.lead { font: 400 30px/1.45 var(--sans); max-width: 1300px; }
+p, li { font-size: 27px; line-height: 1.45; }
+.small { font-size: 23px; line-height: 1.45; color: var(--ink-2); }
+.cols { display: grid; gap: 64px; align-items: start; }
+.cols.c2 { grid-template-columns: 1fr 1fr; }
+.cols.c-wide-left  { grid-template-columns: 1.15fr 0.85fr; }
+.cols.c-wide-right { grid-template-columns: 0.82fr 1.18fr; }
+.stack { display: flex; flex-direction: column; gap: 26px; }
+h3 { font: 600 27px/1.25 var(--sans); color: var(--ink); }
+h3 .sub { font-weight: 400; color: var(--ink-2); }
+
+/* Equation / definition box */
+.box { background: var(--rail); border-radius: 6px; padding: 30px 36px; }
+.eq { font-size: 30px; color: var(--ink); }
+.eq .katex-display { margin: 6px 0; }
+
+/* Symbol list: two-column definition grid */
+.defs { display: grid; grid-template-columns: 150px 1fr; column-gap: 24px; row-gap: 12px; font-size: 24px; line-height: 1.4; }
+.defs dt { color: var(--ink); text-align: right; }
+.defs dd { color: var(--ink-2); }
+
+/* Sequenced steps (only where content really is a sequence) */
+.steps { list-style: none; display: flex; flex-direction: column; gap: 30px; counter-reset: s; }
+.steps li { counter-increment: s; display: grid; grid-template-columns: 56px 1fr; column-gap: 20px; font-size: 24px; line-height: 1.4; }
+.steps li::before {
+    content: counter(s); width: 48px; height: 48px; border-radius: 50%;
+    border: 2px solid var(--ink); color: var(--ink);
+    font: 600 24px/44px var(--sans); text-align: center;
+}
+.steps li b { display: block; font-size: 27px; margin-bottom: 2px; }
+
+/* Plain bullet list */
+.list { list-style: none; display: flex; flex-direction: column; gap: 18px; }
+.list li { position: relative; padding-left: 30px; }
+.list li::before { content: ""; position: absolute; left: 4px; top: 0.62em; width: 10px; height: 10px; border-radius: 50%; background: var(--ink-2); }
+
+/* Tables */
+.tbl { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+.tbl th { font: 600 21px/1.3 var(--sans); color: var(--ink-2); text-align: left; padding: 0 18px 12px 0; border-bottom: 2px solid var(--ink); vertical-align: bottom; }
+.tbl td { font-size: 24px; line-height: 1.32; padding: 13px 18px 13px 0; border-bottom: 1px solid var(--rule); vertical-align: top; }
+.tbl td.c, .tbl th.c { text-align: center; }
+.tbl td.r, .tbl th.r { text-align: right; }
+.tbl tr.group td { border-top: 2px solid var(--rule); }
+.tbl .hi { font-weight: 600; color: var(--ink); }
+.tbl.tight td { padding-top: 9px; padding-bottom: 9px; }
+.tbl .muted { color: var(--ink-2); }
+
+/* Method key (swatch + name) */
+.key { display: inline-flex; align-items: center; gap: 10px; font-size: 23px; color: var(--ink); margin-right: 28px; }
+.key i { width: 22px; height: 14px; border-radius: 3px; display: inline-block; }
+.key i.l { background: var(--lime); } .key i.s { background: var(--shap); }
+.key i.r { background: none; border-top: 3px dashed var(--random); height: 0; border-radius: 0; }
+
+/* Charts */
+.chart text { font-family: var(--sans); fill: var(--ink); }
+.chart .axis text { fill: var(--ink-3); font-size: 19px; }
+.chart .grid line { stroke: var(--rule); stroke-width: 1; }
+.chart .zero { stroke: var(--ink); stroke-width: 1.5; }
+.fig-caption { font-size: 21px; line-height: 1.4; color: var(--ink-2); }
+
+/* Status markers for the proposed procedure (shape + word, never colour alone) */
+.status { display: inline-flex; align-items: center; gap: 8px; font: 500 20px/1 var(--sans); color: var(--ink-2); white-space: nowrap; }
+.status i { width: 16px; height: 16px; border-radius: 50%; border: 2px solid var(--ink); display: inline-block; }
+.status.done i { background: var(--ink); }
+.status.part i { background: linear-gradient(90deg, var(--ink) 50%, transparent 50%); }
+
+/* ===========================================================
+   TITLE SLIDE
+   =========================================================== */
+.title-main { position: absolute; left: 140px; top: 120px; width: 1000px; height: 860px; display: flex; flex-direction: column; justify-content: space-between; }
+.course { font: 400 26px/1.4 var(--sans); color: var(--ink-2); }
+.title-q { font: 500 88px/1.04 var(--serif); font-variation-settings: 'opsz' 72; letter-spacing: -0.02em; color: var(--ink); margin-top: 40px; }
+.title-sub { font: 400 34px/1.35 var(--sans); color: var(--ink-2); margin-top: 36px; max-width: 900px; }
+.authors { display: grid; grid-template-columns: repeat(3, auto); justify-content: start; column-gap: 56px; }
+.authors div { font: 500 26px/1.35 var(--sans); color: var(--ink); }
+.authors span { display: block; font-weight: 400; font-size: 22px; color: var(--ink-2); font-variant-numeric: tabular-nums; }
+.title-panel { position: absolute; right: 0; top: 0; width: 660px; height: 1080px; background: var(--rail); padding: 150px 60px 0 56px; }
+.title-panel h3 { font: 500 30px/1.3 var(--serif); font-variation-settings: 'opsz' 30; margin-bottom: 34px; }
+.tie .lbl { font-size: 23px; fill: var(--ink-2); }
+.tie .lbl.shared { fill: var(--ink); font-weight: 600; }
+.tie .hdr { font-size: 24px; font-weight: 600; }
+.tie .link { stroke: var(--ink); stroke-width: 2.5; fill: none; stroke-dasharray: 120; stroke-dashoffset: 120; }
+.slide.visible .tie .link { animation: draw .9s cubic-bezier(.2,.7,.2,1) forwards; }
+.slide.visible .tie .link.l2 { animation-delay: .25s; }
+@keyframes draw { to { stroke-dashoffset: 0; } }
+@media (prefers-reduced-motion: reduce) { .tie .link { stroke-dashoffset: 0; } }
+@media print { .tie .link { stroke-dashoffset: 0 !important; animation: none !important; } .edit-toggle, .edit-hotzone { display: none !important; } }
+
+/* ===========================================================
+   CLOSING SLIDE
+   =========================================================== */
+.refs { list-style: none; display: flex; flex-direction: column; gap: 18px; }
+.refs li { font-size: 23px; line-height: 1.42; color: var(--ink); padding-left: 0; }
+.refs li em { font-style: italic; }
+
+/* ===========================================================
+   INLINE EDITING (press E, or hover the top-left corner)
+   =========================================================== */
+.edit-hotzone { position: fixed; top: 0; left: 0; width: 80px; height: 80px; z-index: 10000; cursor: pointer; }
+.edit-toggle { position: fixed; top: 16px; left: 16px; z-index: 10001; opacity: 0; pointer-events: none; transition: opacity .3s ease;
+    font: 500 15px var(--sans); color: #fff; background: var(--ink); border: 0; border-radius: 6px; padding: 8px 12px; cursor: pointer; }
+.edit-toggle.show, .edit-toggle.active { opacity: 1; pointer-events: auto; }
+body.editing [contenteditable="true"]:hover { outline: 2px dashed rgba(44,109,176,.5); outline-offset: 4px; }
+body.editing [contenteditable="true"]:focus { outline: 2px solid var(--shap); outline-offset: 4px; }
+
+/* Keyboard focus for deck chrome */
+button:focus-visible { outline: 3px solid var(--lime); outline-offset: 3px; }
+</style>
+</head>
+<body>
+<div class="edit-hotzone" aria-hidden="true"></div>
+<button class="edit-toggle" id="editToggle" title="Edit text (E). Ctrl+S saves a copy.">Edit text</button>
+
+<div class="deck-viewport">
+<main class="deck-stage" id="deckStage" aria-live="polite">
+
+<!-- =========================================================
+     0. TITLE
+     ========================================================= -->
+<section class="slide active" aria-label="Title">
+    <div class="title-main">
+        <div>
+            <p class="course">CS420 Introduction to Artificial Intelligence, Seminar S04</p>
+            <h1 class="title-q">Does a highly accurate prediction come with a reliable explanation?</h1>
+            <p class="title-sub">Testing LIME and SHAP on breast-cancer predictions: do they agree, do they stay the same when re-run, and do they find the features that really drive the model?</p>
+        </div>
+        <div class="authors">
+            <div>Nguyễn Trọng Hoàng<span>24125056</span></div>
+            <div>Phan Minh Khôi<span>24125061</span></div>
+            <div>Nguyễn Thuận Việt<span>24125051</span></div>
+        </div>
+    </div>
+    <aside class="title-panel" aria-label="LIME and SHAP top-5 features for the misclassified tumour">
+        <h3>One misclassified tumour, two explanations</h3>
+        <svg class="chart tie" viewBox="0 0 560 440" width="560" height="440" role="img"
+             aria-label="Top-5 features: LIME and SHAP share only mean area and mean radius">
+            <text class="hdr" x="258" y="28" text-anchor="end" fill="#A35700">LIME top 5</text>
+            <rect x="0" y="14" width="18" height="14" rx="3" fill="#E07B00"/>
+            <text class="hdr" x="322" y="28" fill="#245C96">SHAP top 5</text>
+            <rect x="542" y="14" width="18" height="14" rx="3" fill="#2C6DB0"/>
+            <line x1="0" y1="50" x2="560" y2="50" stroke="#D3DBE6"/>
+            <!-- LIME column (right-aligned at x=258) -->
+            <text class="lbl" x="258" y="100" text-anchor="end">worst concave points</text>
+            <text class="lbl shared" x="258" y="170" text-anchor="end">mean area</text>
+            <text class="lbl shared" x="258" y="240" text-anchor="end">mean radius</text>
+            <text class="lbl" x="258" y="310" text-anchor="end">mean perimeter</text>
+            <text class="lbl" x="258" y="380" text-anchor="end">worst concavity</text>
+            <!-- SHAP column (left-aligned at x=322) -->
+            <text class="lbl" x="322" y="100">worst area</text>
+            <text class="lbl" x="322" y="170">worst perimeter</text>
+            <text class="lbl" x="322" y="240">worst radius</text>
+            <text class="lbl shared" x="322" y="310">mean area</text>
+            <text class="lbl shared" x="322" y="380">mean radius</text>
+            <!-- Links between shared features -->
+            <path class="link l1" d="M266 162 C290 162, 292 302, 314 302"/>
+            <path class="link l2" d="M266 232 C290 232, 292 372, 314 372"/>
+        </svg>
+        <p class="fig-caption" style="margin-top:28px;max-width:540px">Random Forest says P(malignant) = 0.745; the tumour is benign. The two methods share 2 of their 5 most important features.</p>
+    </aside>
+</section>
+
+<!-- =========================================================
+     1. QUESTION AND SETUP
+     ========================================================= -->
+<section class="slide" data-section="Question">
+    <aside class="rail"><ul class="outline"></ul>
+        <p class="source"><b>Sources</b>Data: Street et al. (1993). Accuracy and instances: our experiment.</p></aside>
+    <div class="body">
+        <h2 class="headline">We judge an explanation on three things, not on the model’s accuracy</h2>
+        <div class="cols" style="grid-template-columns:repeat(3,1fr);gap:56px">
+            <div class="stack" style="gap:10px"><h3>Useful</h3><p>It shows which features push the prediction up or down.</p></div>
+            <div class="stack" style="gap:10px"><h3>Stable</h3><p>It stays the same when the random seed or background data change.</p></div>
+            <div class="stack" style="gap:10px"><h3>Faithful</h3><p>Removing the features it ranks highest really changes the prediction.</p></div>
+        </div>
+        <div class="cols" style="grid-template-columns:0.9fr 1.1fr;gap:64px;border-top:1px solid var(--rule);padding-top:40px">
+            <div class="stack" style="gap:18px">
+                <h3>Setup</h3>
+                <ul class="list">
+                    <li>Breast Cancer Wisconsin: 569 tumours, 30 cell-nucleus measurements, 80/20 split</li>
+                    <li>Logistic Regression <b class="num">98.2%</b> and Random Forest <b class="num">95.6%</b> test accuracy</li>
+                    <li>Both methods explain <b>P(malignant)</b></li>
+                </ul>
+            </div>
+            <div class="stack" style="gap:14px">
+                <h3>Three test instances, chosen by a fixed rule</h3>
+                <table class="tbl">
+                    <thead><tr><th>Instance</th><th>True label</th><th class="r">P(malignant), RF / LR</th></tr></thead>
+                    <tbody>
+                        <tr><td>Confidently correct</td><td>malignant</td><td class="r">1.000 / 1.000</td></tr>
+                        <tr><td>Borderline</td><td>benign</td><td class="r">0.495 / 0.634</td></tr>
+                        <tr><td>Misclassified</td><td>benign</td><td class="r">0.745 / 0.466</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="folio"></div>
+</section>
+
+<!-- =========================================================
+     2. CORE CONCEPTS
+     ========================================================= -->
+<section class="slide" data-section="Background">
+    <aside class="rail"><ul class="outline"></ul>
+        <p class="source"><b>Sources</b>Mersha et al. (2024); Ribeiro et al. (2016); Lundberg &amp; Lee (2017).</p></aside>
+    <div class="body">
+        <h2 class="headline">LIME and SHAP explain one prediction after training, for any model</h2>
+        <table class="tbl" style="table-layout:fixed">
+            <colgroup><col style="width:24%"><col style="width:38%"><col style="width:38%"></colgroup>
+            <thead><tr><th>Concept pair</th><th>Distinction</th><th>Where LIME and SHAP fall</th></tr></thead>
+            <tbody>
+                <tr><td class="hi">Explainability vs. interpretability</td><td>Reasons for one decision vs. understanding how the whole model works</td><td>They give explainability; the model stays a black box</td></tr>
+                <tr><td class="hi">Local vs. global</td><td>One instance vs. the whole model</td><td>Both local; SP-LIME picks representative instances for a global view</td></tr>
+                <tr><td class="hi">Model-specific vs. model-agnostic</td><td>Uses the model’s structure vs. only its prediction function</td><td>LIME and KernelSHAP are agnostic; Linear and Deep SHAP are specific</td></tr>
+                <tr><td class="hi">Intrinsic vs. post-hoc</td><td>Understandable by design vs. explained after training</td><td>Both post-hoc and perturbation-based</td></tr>
+            </tbody>
+        </table>
+        <div class="box" style="padding:26px 34px">
+            <p style="font-size:25px">Mersha et al. (2024) sort XAI methods along four axes: <b>scope, stage, applicability</b> and <b>design</b> (perturbation or gradient). For judging explanations they list five computer-centred criteria, <b>fidelity, consistency, robustness, efficiency</b> and <b>sufficiency</b>, which we use to organise our evaluation.</p>
+        </div>
+    </div>
+    <div class="folio"></div>
+</section>
+
+<!-- =========================================================
+     3. LIME
+     ========================================================= -->
+<section class="slide" data-section="Background">
+    <aside class="rail"><ul class="outline"></ul>
+        <p class="source"><b>Source</b>Method and equation: Ribeiro, Singh &amp; Guestrin (2016), KDD.</p></aside>
+    <div class="body">
+        <h2 class="headline">LIME fits a simple model that imitates the black box near one input</h2>
+        <div class="cols" style="grid-template-columns:0.74fr 1.26fr;gap:56px">
+            <ol class="steps" style="gap:26px">
+                <li><span><b>Perturb</b>Sample points \(z\) near \(x\) and query \(f(z)\); 5000 by default.</span></li>
+                <li><span><b>Weight</b>Closer samples count more, via the kernel \(\pi_x\).</span></li>
+                <li><span><b>Fit</b>Fit a sparse weighted linear \(g\); its weights are the explanation.</span></li>
+            </ol>
+            <div class="stack" style="gap:24px">
+                <div class="box eq">
+                    \[\xi(x)=\arg\min_{g\in G}\; L(f,g,\pi_x)+\Omega(g)\]
+                    \[L=\sum_{z,z'}\pi_x(z)\,\big(f(z)-g(z')\big)^2,\quad \pi_x(z)=\exp\!\big(-D(x,z)^2/\sigma^2\big)\]
+                </div>
+                <dl class="defs">
+                    <dt>\(f,\ x\)</dt><dd>black box, \(f(x)\in[0,1]\) is P(malignant); instance \(x\in\mathbb{R}^{30}\)</dd>
+                    <dt>\(z,\ z'\)</dt><dd>perturbed sample; its on/off form \(z'\in\{0,1\}^N\)</dd>
+                    <dt>\(\pi_x,\ \sigma\)</dt><dd>weight in \((0,1]\); width \(\sigma&gt;0\): too small is noisy, too large is no longer local</dd>
+                    <dt>\(G,\ \Omega\)</dt><dd>linear models; \(\Omega(g)=\infty\cdot\mathbb{1}[\lVert w_g\rVert_0&gt;K]\) keeps at most \(K\) features</dd>
+                    <dt>\(L\)</dt><dd>weighted squared error, \(L\ge 0\), in squared probability units</dd>
+                </dl>
+            </div>
+        </div>
+        <p class="small" style="max-width:1360px">From the paper: the kernel and \(\sigma\) are chosen heuristically, with no guarantee that the weights add up to the prediction. In the <code>lime</code> library, continuous features are discretised by default, so a weight describes the value range the instance falls in.</p>
+    </div>
+    <div class="folio"></div>
+</section>
+
+<!-- =========================================================
+     4. SHAP
+     ========================================================= -->
+<section class="slide" data-section="Background">
+    <aside class="rail"><ul class="outline"></ul>
+        <p class="source"><b>Source</b>Equations, Theorems 1 and 2: Lundberg &amp; Lee (2017), NeurIPS.</p></aside>
+    <div class="body">
+        <h2 class="headline">SHAP splits the prediction exactly among the features</h2>
+        <div class="cols" style="grid-template-columns:1.08fr 0.92fr;gap:60px">
+            <div class="stack" style="gap:22px">
+                <div class="box eq">
+                    \[g(z')=\varphi_0+\sum_{j=1}^{M}\varphi_j z'_j,\qquad z'\in\{0,1\}^M\]
+                    \[\varphi_j=\sum_{S\subseteq F\setminus\{j\}}\frac{|S|!\,(M-|S|-1)!}{M!}\Big[f_{S\cup\{j\}}-f_S\Big]\]
+                </div>
+                <dl class="defs" style="grid-template-columns:110px 1fr">
+                    <dt>\(M,\ F\)</dt><dd>number of features (30) and the set of all features</dd>
+                    <dt>\(S,\ f_S\)</dt><dd>a subset without \(j\); prediction when only \(S\) is known, the rest averaged over background data</dd>
+                    <dt>\(\varphi_j\)</dt><dd>a change in probability, \(\varphi_0\in[0,1]\), \(\varphi_j\in[-1,1]\)</dd>
+                </dl>
+            </div>
+            <div class="stack" style="gap:26px">
+                <div class="stack" style="gap:10px">
+                    <h3>Theorem 1: the only additive attribution with</h3>
+                    <ul class="list" style="gap:8px">
+                        <li><b>local accuracy</b>, \(g(x')=f(x)\)</li>
+                        <li><b>missingness</b>, an absent feature gets 0</li>
+                        <li><b>consistency</b>, more influence never lowers credit</li>
+                    </ul>
+                </div>
+                <div class="stack" style="gap:10px">
+                    <h3>Reading a SHAP explanation</h3>
+                    <ul class="list" style="gap:8px">
+                        <li><b>Baseline</b> \(\varphi_0=\mathbb{E}[f(X)]\) over the background</li>
+                        <li><b>Contribution</b> \(\varphi_0+\sum_j\varphi_j=f(x)\) exactly</li>
+                        <li><b>Sign</b>: positive pushes above the baseline</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="box" style="padding:22px 32px">
+            <p style="font-size:24px"><b>How the two papers connect.</b> KernelSHAP is LIME with a specific kernel, loss and regulariser (Theorem 2); LIME’s heuristic choices can break local accuracy or consistency. KernelSHAP assumes features are independent, and its result depends on the background data.</p>
+        </div>
+    </div>
+    <div class="folio"></div>
+</section>
+
+<!-- =========================================================
+     5. WORKED EXAMPLE 1: SHAP BY HAND
+     ========================================================= -->
+<section class="slide" data-section="Method">
+    <aside class="rail"><ul class="outline"></ul>
+        <p class="source"><b>Source</b>Worked example by the team; closed form from Lundberg &amp; Lee (2017).</p></aside>
+    <div class="body">
+        <h2 class="headline">Worked example 1: SHAP contributions add up to the prediction</h2>
+        <div class="cols" style="grid-template-columns:1.2fr 0.8fr;gap:56px">
+            <div class="stack" style="gap:22px">
+                <div class="box" style="font-size:26px;line-height:1.55;padding:24px 32px">
+                    Linear model, independent features, background at the mean:<br>
+                    \(f(x)=1+2x_1-x_2+0.5x_3\), \(\ \mu=(1,2,4)\), \(\ x=(3,1,6)\)<br>
+                    Closed form: \(\varphi_j=w_j\,(x_j-\mu_j)\)
+                </div>
+                <ul class="list" style="gap:14px">
+                    <li><b>Baseline</b> \(\varphi_0=f(\mu)=1+2-2+2=3\)</li>
+                    <li><b>Prediction</b> \(f(x)=1+6-1+3=9\)</li>
+                    <li><b>Contributions</b> \(\varphi_1=2(3-1)=4,\ \varphi_2=(-1)(1-2)=1,\ \varphi_3=0.5(6-4)=1\)</li>
+                    <li><b>Check</b> \(3+4+1+1=9=f(x)\); the full Shapley sum gives the same \((4,1,1)\)</li>
+                </ul>
+                <p class="small">Feature 2 has a negative weight but a positive contribution, because \(x_2\) is below its mean. The sign depends on the weight <i>and</i> on where the instance lies.</p>
+            </div>
+            <svg class="chart" viewBox="0 0 620 560" width="540" height="488" style="margin-top:20px" role="img" aria-label="Waterfall: baseline 3 plus 4 plus 1 plus 1 equals prediction 9">
+                <g class="grid">
+                    <line x1="60" x2="610" y1="470" y2="470"/><line x1="60" x2="610" y1="374" y2="374"/>
+                    <line x1="60" x2="610" y1="278" y2="278"/><line x1="60" x2="610" y1="182" y2="182"/>
+                    <line x1="60" x2="610" y1="86" y2="86"/>
+                </g>
+                <g class="axis">
+                    <text x="48" y="476" text-anchor="end">0</text><text x="48" y="380" text-anchor="end">2</text>
+                    <text x="48" y="284" text-anchor="end">4</text><text x="48" y="188" text-anchor="end">6</text>
+                    <text x="48" y="92" text-anchor="end">8</text>
+                </g>
+                <!-- 48 px per unit; zero at y=470 -->
+                <rect x="80"  y="326" width="86" height="144" rx="4" fill="#8C96A3"><title>Baseline φ0 = 3</title></rect>
+                <rect x="190" y="134" width="86" height="190" rx="4" fill="#2C6DB0"><title>φ1 = +4</title></rect>
+                <rect x="300" y="86"  width="86" height="46"  rx="4" fill="#2C6DB0"><title>φ2 = +1</title></rect>
+                <rect x="410" y="38"  width="86" height="46"  rx="4" fill="#2C6DB0"><title>φ3 = +1</title></rect>
+                <rect x="520" y="38"  width="86" height="432" rx="4" fill="#13294B"><title>f(x) = 9</title></rect>
+                <g stroke="#66758B" stroke-dasharray="4 4" stroke-width="1.5">
+                    <line x1="166" x2="190" y1="326" y2="326"/><line x1="276" x2="300" y1="134" y2="134"/>
+                    <line x1="386" x2="410" y1="86" y2="86"/><line x1="496" x2="520" y1="38" y2="38"/>
+                </g>
+                <g font-size="24" font-weight="600" text-anchor="middle">
+                    <text x="123" y="314">3</text><text x="233" y="230" fill="#fff">+4</text>
+                    <text x="343" y="117" fill="#fff">+1</text><text x="453" y="69" fill="#fff">+1</text>
+                    <text x="563" y="260" fill="#fff">9</text>
+                </g>
+                <g font-size="22" text-anchor="middle" fill="#13294B">
+                    <text x="123" y="506">φ₀</text><text x="233" y="506">φ₁</text><text x="343" y="506">φ₂</text>
+                    <text x="453" y="506">φ₃</text><text x="563" y="506">f(x)</text>
+                </g>
+                <g font-size="19" text-anchor="middle" fill="#66758B">
+                    <text x="123" y="534">baseline</text><text x="563" y="534">prediction</text>
+                </g>
+            </svg>
+        </div>
+    </div>
+    <div class="folio"></div>
+</section>
+
+<!-- =========================================================
+     6. WORKED EXAMPLE 2: LIME BY HAND
+     ========================================================= -->
+<section class="slide" data-section="Method">
+    <aside class="rail"><ul class="outline"></ul>
+        <p class="source"><b>Source</b>Worked example by the team, checked with NumPy; method from Ribeiro et al. (2016).</p></aside>
+    <div class="body">
+        <h2 class="headline">Worked example 2: LIME recovers the local slopes, approximately</h2>
+        <div class="cols" style="grid-template-columns:0.95fr 1.05fr;gap:60px">
+            <div class="stack" style="gap:22px">
+                <div class="box" style="font-size:26px;line-height:1.6">
+                    \(f(x)=\mathrm{sigmoid}(x_1^2-x_2)\), explain \(x_0=(1,2)\), \(f(x_0)=0.2689\)<br>
+                    <span class="small">Simplified: 6 fixed points, \(\sigma=1\), no \(\Omega\), shifted raw features as \(z'\)</span>
+                </div>
+                <ol class="steps" style="gap:16px">
+                    <li><span><b>Perturb and query</b>\(z=(1.3,2.2)\Rightarrow f(z)=\mathrm{sigmoid}(-0.51)=0.3752\)</span></li>
+                    <li><span><b>Weight by distance</b>\(D=0.361,\ \pi=e^{-D^2/\sigma^2}=0.878\)</span></li>
+                    <li><span><b>Fit weighted least squares</b>\(\beta=(A^\top WA)^{-1}A^\top Wy\), row of \(A\): \([1,\,z_1{-}1,\,z_2{-}2]\)</span></li>
+                </ol>
+            </div>
+            <div class="stack" style="gap:24px">
+                <table class="tbl tight">
+                    <thead><tr><th class="r">\(z_1\)</th><th class="r">\(z_2\)</th><th class="r">\(f(z)\)</th><th class="r">\(D\)</th><th class="r">\(\pi\)</th></tr></thead>
+                    <tbody>
+                        <tr><td class="r">1.3</td><td class="r">2.2</td><td class="r">0.3752</td><td class="r">0.361</td><td class="r">0.878</td></tr>
+                        <tr><td class="r">0.6</td><td class="r">2.1</td><td class="r">0.1493</td><td class="r">0.412</td><td class="r">0.844</td></tr>
+                        <tr><td class="r">1.2</td><td class="r">1.5</td><td class="r">0.4850</td><td class="r">0.539</td><td class="r">0.748</td></tr>
+                        <tr><td class="r">0.9</td><td class="r">1.7</td><td class="r">0.2911</td><td class="r">0.316</td><td class="r">0.905</td></tr>
+                        <tr><td class="r">1.5</td><td class="r">2.4</td><td class="r">0.4626</td><td class="r">0.640</td><td class="r">0.664</td></tr>
+                        <tr><td class="r">0.7</td><td class="r">2.5</td><td class="r">0.1182</td><td class="r">0.583</td><td class="r">0.712</td></tr>
+                    </tbody>
+                </table>
+                <table class="tbl tight">
+                    <thead><tr><th>Slope at \(x_0\)</th><th class="r">LIME, \(\sigma=1\)</th><th class="r">True</th><th class="r">\(\sigma=0.3\)</th><th class="r">\(\sigma=3\)</th></tr></thead>
+                    <tbody>
+                        <tr><td>\(\partial f/\partial x_1\)</td><td class="r hi">0.395</td><td class="r">0.393</td><td class="r muted">0.362</td><td class="r muted">0.397</td></tr>
+                        <tr><td>\(\partial f/\partial x_2\)</td><td class="r hi">−0.149</td><td class="r">−0.197</td><td class="r muted">−0.132</td><td class="r muted">−0.150</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <p class="small" style="max-width:1360px">\(g_1\) is almost exact; \(g_2\) has the right sign but is off by 0.05, because 6 points cannot capture the curvature of \(f\). Even this small example shows that a LIME explanation depends on the perturbation sample.</p>
+    </div>
+    <div class="folio"></div>
+</section>
+
+<!-- =========================================================
+     7. LIME VS SHAP: COMPARISON TABLE
+     ========================================================= -->
+<section class="slide" data-section="Results">
+    <aside class="rail"><ul class="outline"></ul>
+        <p class="source"><b>Source</b>Our experiment, results/<wbr>compare_lime_shap.csv.</p></aside>
+    <div class="body" style="gap:30px">
+        <h2 class="headline">The two methods agree less as the prediction gets harder</h2>
+        <table class="tbl tight" style="table-layout:fixed">
+            <colgroup><col style="width:7%"><col style="width:18%"><col style="width:13%"><col style="width:9%"><col style="width:20%"><col style="width:18%"><col style="width:15%"></colgroup>
+            <thead><tr><th>Model</th><th>Instance</th><th class="c">Overlap@5<br><span style="font-weight:400">main / avg</span></th><th class="c">Spearman ρ</th><th>Top-1 LIME</th><th>Top-1 SHAP</th><th class="r">Runtime (s)<br><span style="font-weight:400">LIME / SHAP</span></th></tr></thead>
+            <tbody>
+                <tr><td>LR</td><td>Confidently correct</td><td class="c hi">1.0 / 0.80</td><td class="c">0.74</td><td>worst texture</td><td>worst area</td><td class="r">0.035 / 0.043</td></tr>
+                <tr><td>LR</td><td>Borderline</td><td class="c hi">0.6 / 0.67</td><td class="c">0.24</td><td>worst texture</td><td>worst texture</td><td class="r">0.037 / 0.035</td></tr>
+                <tr><td>LR</td><td>Misclassified</td><td class="c hi">0.4 / 0.49</td><td class="c">0.26</td><td>worst symmetry</td><td>worst symmetry</td><td class="r">0.040 / 0.034</td></tr>
+                <tr class="group"><td>RF</td><td>Confidently correct</td><td class="c hi">0.8 / 0.82</td><td class="c">0.83</td><td>worst concave points</td><td>worst area</td><td class="r">0.066 / 0.441</td></tr>
+                <tr><td>RF</td><td>Borderline</td><td class="c hi">0.6 / 0.71</td><td class="c">0.69</td><td>worst concavity</td><td>worst perimeter</td><td class="r">0.067 / 0.484</td></tr>
+                <tr><td>RF</td><td>Misclassified</td><td class="c hi">0.4 / 0.44</td><td class="c">0.46</td><td>worst concave points</td><td>worst area</td><td class="r">0.069 / 0.390</td></tr>
+            </tbody>
+        </table>
+        <div class="cols" style="grid-template-columns:repeat(3,1fr);gap:48px">
+            <div class="stack" style="gap:8px"><h3>Which features, not which direction</h3><p style="font-size:24px">Overlap@5 falls from 0.8–1.0 to 0.4. When both pick a feature, they always give it the same sign.</p></div>
+            <div class="stack" style="gap:8px"><h3>Even the linear model</h3><p style="font-size:24px">Rankings differ most for LR on hard cases (ρ = 0.24, 0.26), possibly because LIME discretises features (untested).</p></div>
+            <div class="stack" style="gap:8px"><h3>KernelSHAP costs more</h3><p style="font-size:24px">On RF it is 6–7× slower than LIME: 2000 coalitions × 100 background rows. One machine, ±20%.</p></div>
+        </div>
+        <p class="small" style="margin-top:-12px">Overlap@5 = shared features in the two top-5 sets ÷ 5. Spearman ρ compares the rankings of all 30 features by |contribution|.</p>
+    </div>
+    <div class="folio"></div>
+</section>
+
+<!-- =========================================================
+     8. A CASE WHERE THE EXPLANATIONS DISAGREE
+     ========================================================= -->
+<section class="slide" data-section="Results">
+    <aside class="rail"><ul class="outline"></ul>
+        <p class="source"><b>Source</b>Our experiment; values measured from the report’s Random Forest contribution figure.</p></aside>
+    <div class="body" style="gap:30px">
+        <h2 class="headline">On the misclassified tumour, the two methods tell different stories</h2>
+        <p class="small" style="color:var(--ink)">Random Forest, test index 3: P(malignant) = 0.745, but the tumour is benign. Top 8 features; the top 5 are solid, shared features in bold.</p>
+        <div class="cols c2" style="gap:56px">
+            <div class="stack" style="gap:6px">
+                <span class="key"><i class="l"></i>LIME</span>
+                <svg class="chart" id="contribLime" width="682" height="470" viewBox="0 0 682 470" role="img" aria-label="LIME contributions for the misclassified instance"></svg>
+            </div>
+            <div class="stack" style="gap:6px">
+                <span class="key"><i class="s"></i>SHAP</span>
+                <svg class="chart" id="contribShap" width="682" height="470" viewBox="0 0 682 470" role="img" aria-label="SHAP contributions for the misclassified instance"></svg>
+            </div>
+        </div>
+        <div class="cols c2" style="gap:56px">
+            <p style="font-size:24px">LIME’s top feature, <b>worst concave points</b>, pushes towards benign, while size features push towards malignant: a mixed picture.</p>
+            <p style="font-size:24px">SHAP puts the blame almost entirely on <b>size features</b>, all pushing towards malignant. Overlap@5 = 0.4.</p>
+        </div>
+    </div>
+    <div class="folio"></div>
+</section>
+
+<!-- =========================================================
+     9. STABILITY
+     ========================================================= -->
+<section class="slide" data-section="Results">
+    <aside class="rail"><ul class="outline"></ul>
+        <p class="source"><b>Source</b>Our experiment, results/stability.csv, sensitivity.csv; LIME 20 seeds, SHAP 5 background sets.</p></aside>
+    <div class="body" style="gap:32px">
+        <h2 class="headline">Re-running changes the explanation, and tuning does not fix it</h2>
+        <div class="cols" style="grid-template-columns:0.84fr 1.16fr;gap:56px">
+            <div class="stack" style="gap:18px">
+                <table class="tbl tight">
+                    <thead><tr><th>Model</th><th>Instance</th><th class="r">Jaccard<br>LIME</th><th class="r">Jaccard<br>SHAP</th></tr></thead>
+                    <tbody>
+                        <tr><td>LR</td><td>Confident</td><td class="r">0.78</td><td class="r">0.68</td></tr>
+                        <tr><td>LR</td><td>Borderline</td><td class="r">0.84</td><td class="r">0.73</td></tr>
+                        <tr><td>LR</td><td>Misclassified</td><td class="r">0.85</td><td class="r hi">0.53</td></tr>
+                        <tr class="group"><td>RF</td><td>Confident</td><td class="r">0.94</td><td class="r">1.00</td></tr>
+                        <tr><td>RF</td><td>Borderline</td><td class="r hi">0.72</td><td class="r">0.73</td></tr>
+                        <tr><td>RF</td><td>Misclassified</td><td class="r">0.74</td><td class="r">1.00</td></tr>
+                    </tbody>
+                </table>
+                <p class="small">Mean Jaccard of top-5 sets over all run pairs; 1 means every run picks the same five.</p>
+                <ul class="list" style="gap:10px">
+                    <li style="font-size:23px"><b>Neither is always more stable:</b> LIME 0.72–0.94, SHAP 0.53–1.00.</li>
+                    <li style="font-size:23px"><b>The top feature can flip on easy cases:</b> same top-1 in only 60% of LIME runs (RF), 40% of SHAP runs (LR).</li>
+                    <li style="font-size:23px"><b>Tuning does not help:</b> background 10–100, kernel width 1–8, Jaccard never above 0.73.</li>
+                </ul>
+            </div>
+            <div class="stack" style="gap:8px">
+                <h3>Random Forest, borderline: share of runs where each feature is in the top 5</h3>
+                <div><span class="key"><i class="l"></i>LIME, 20 seeds</span><span class="key"><i class="s"></i>SHAP, 5 background sets</span></div>
+                <svg class="chart" id="stabChart" width="800" height="550" viewBox="0 0 800 550" role="img" aria-label="Top-5 frequency per feature for LIME and SHAP"></svg>
+            </div>
+        </div>
+    </div>
+    <div class="folio"></div>
+</section>
+
+<!-- =========================================================
+     10. FAITHFULNESS: DELETION TEST
+     ========================================================= -->
+<section class="slide" data-section="Results">
+    <aside class="rail"><ul class="outline"></ul>
+        <p class="source"><b>Source</b>Our experiment, results/deletion_curves.csv; 20 test instances, one seed.</p></aside>
+    <div class="body" style="gap:24px">
+        <h2 class="headline">Both methods find influential features far better than chance, but neither beats the other</h2>
+        <p style="font-size:25px;max-width:1360px">Remove the top-ranked features one at a time (replace with the training mean) and watch the probability of the predicted class. A faithful ranking makes it fall fast. Baseline: random order, 10 permutations.</p>
+        <div>
+            <span class="key"><i class="l"></i>LIME order</span><span class="key"><i class="s"></i>SHAP order</span><span class="key"><i class="r"></i>Random order</span>
+        </div>
+        <div class="cols c2" style="gap:40px">
+            <svg class="chart" id="delRF" width="690" height="440" viewBox="0 0 690 440" role="img" aria-label="Deletion curves, Random Forest"></svg>
+            <svg class="chart" id="delLR" width="690" height="440" viewBox="0 0 690 440" role="img" aria-label="Deletion curves, Logistic Regression"></svg>
+        </div>
+        <p style="font-size:24px;max-width:1380px">After 5 removals the gap between LIME and SHAP is at most 0.02, and 0.04 after 10: too small to rank them with one seed, 20 instances and no confidence intervals. <span class="muted" style="color:var(--ink-2)">Caveat: mean replacement can create unrealistic inputs, and correlated features keep each other’s information.</span></p>
+    </div>
+    <div class="folio"></div>
+</section>
+
+<!-- =========================================================
+     11. NOT CAUSAL + PROPOSED PROCEDURE
+     ========================================================= -->
+<section class="slide" data-section="Discussion">
+    <aside class="rail"><ul class="outline"></ul>
+        <p class="source"><b>Sources</b>Criteria adapted from Mersha et al. (2024); procedure proposed by the team.</p></aside>
+    <div class="body" style="gap:30px">
+        <h2 class="headline">An importance score says what the model relies on, not what causes cancer</h2>
+        <div class="cols" style="grid-template-columns:0.92fr 1.08fr;gap:64px">
+            <div class="stack" style="gap:18px">
+                <h3>Why importance is not a causal effect</h3>
+                <ul class="list" style="gap:16px">
+                    <li style="font-size:24px"><b>Correlated features.</b> Worst radius, perimeter and area grow together; how credit is split depends on the model and background.</li>
+                    <li style="font-size:24px"><b>Unrealistic samples.</b> Both methods change features independently, e.g. a large area with a small radius.</li>
+                    <li style="font-size:24px"><b>Model mistakes.</b> On the misclassified tumour, size features explain the error, not malignancy.</li>
+                    <li style="font-size:24px"><b>No real intervention.</b> Replacing a value is a computation on the model, not a change to a tumour.</li>
+                </ul>
+            </div>
+            <div class="stack" style="gap:18px">
+                <h3>Proposed check before trusting an explanation</h3>
+                <table class="tbl">
+                    <thead><tr><th>Step</th><th>Criterion</th><th>Status here</th></tr></thead>
+                    <tbody>
+                        <tr><td>1. Sanity check on a known answer, \(w_j(x_j-\mu_j)\)</td><td>fidelity</td><td><span class="status part"><i></i>Worked example only</span></td></tr>
+                        <tr><td>2. Local fit: LIME \(R^2\); SHAP sums to \(f(x)\)</td><td>fidelity</td><td><span class="status part"><i></i>SHAP only</span></td></tr>
+                        <tr><td>3. Deletion and insertion vs. random</td><td>fidelity, sufficiency</td><td><span class="status part"><i></i>Deletion only</span></td></tr>
+                        <tr><td>4. Top-k Jaccard over seeds and backgrounds</td><td>consistency</td><td><span class="status done"><i></i>Done</span></td></tr>
+                        <tr><td>5. Small input changes, similar models</td><td>robustness</td><td><span class="status"><i></i>Not done</span></td></tr>
+                    </tbody>
+                </table>
+                <p class="small">Trust an explanation only if it passes several checks together.</p>
+            </div>
+        </div>
+    </div>
+    <div class="folio"></div>
+</section>
+
+<!-- =========================================================
+     12. CONCLUSION
+     ========================================================= -->
+<section class="slide" data-section="Conclusion">
+    <aside class="rail"><ul class="outline"></ul>
+        <p class="source"><b>Source</b>Our experiment and report.</p></aside>
+    <div class="body" style="gap:44px">
+        <h2 class="headline">No: a 98% accurate model can still give an unreliable explanation</h2>
+        <div class="cols" style="grid-template-columns:repeat(3,1fr);gap:56px">
+            <div class="stack" style="gap:10px"><h3>Agreement</h3><p style="font-size:25px">On the misclassified tumour LIME and SHAP share only <b class="num">2 of 5</b> top features.</p></div>
+            <div class="stack" style="gap:10px"><h3>Stability</h3><p style="font-size:25px">Top-5 sets change between runs: mean Jaccard as low as <b class="num">0.53</b> (SHAP) and <b class="num">0.72</b> (LIME).</p></div>
+            <div class="stack" style="gap:10px"><h3>Faithfulness</h3><p style="font-size:25px">Both beat random deletion clearly; neither is shown to be more faithful, and neither reveals causes.</p></div>
+        </div>
+        <div class="cols c2" style="gap:64px;border-top:1px solid var(--rule);padding-top:40px">
+            <div class="stack" style="gap:14px">
+                <h3>Conditions of use</h3>
+                <ul class="list" style="gap:10px">
+                    <li style="font-size:24px">Report the seed, background data and kernel width</li>
+                    <li style="font-size:24px">Repeat the explanation and report its stability</li>
+                    <li style="font-size:24px">Run the checks above, above all for borderline and wrong predictions</li>
+                    <li style="font-size:24px">Say “the model relies on X”, not “X causes Y”</li>
+                </ul>
+            </div>
+            <div class="stack" style="gap:14px">
+                <h3>Limits and next steps</h3>
+                <ul class="list" style="gap:10px">
+                    <li style="font-size:24px">One dataset, three instances, two models, no confidence intervals: illustrative only</li>
+                    <li style="font-size:24px">Probability scale and KernelSHAP only</li>
+                    <li style="font-size:24px">Next: insertion test, LIME \(R^2\), TreeSHAP, log-odds, more data and repetitions</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="folio"></div>
+</section>
+
+<!-- =========================================================
+     13. REFERENCES AND QUESTIONS
+     ========================================================= -->
+<section class="slide" data-section="References">
+    <div class="body" style="left:140px;width:1640px;top:110px;gap:48px">
+        <h2 class="headline" style="font-size:76px">Questions</h2>
+        <div class="cols" style="grid-template-columns:1.25fr 0.75fr;gap:80px">
+            <div class="stack" style="gap:18px">
+                <h3>References</h3>
+                <ol class="refs">
+                    <li>Ribeiro, M. T., Singh, S. &amp; Guestrin, C. (2016). “Why Should I Trust You?”: Explaining the Predictions of Any Classifier. <em>KDD 2016</em>, 1135–1144.</li>
+                    <li>Lundberg, S. M. &amp; Lee, S.-I. (2017). A Unified Approach to Interpreting Model Predictions. <em>NeurIPS 2017</em>.</li>
+                    <li>Mersha, M., Lam, K., Wood, J., AlShami, A. &amp; Kalita, J. (2024). Explainable artificial intelligence: A survey of needs, techniques, applications, and future direction. <em>Neurocomputing</em> 599, 128111.</li>
+                    <li>Street, W. N., Wolberg, W. H. &amp; Mangasarian, O. L. (1993). Nuclear feature extraction for breast tumor diagnosis. <em>Proc. SPIE</em> 1905, 861–870.</li>
+                </ol>
+            </div>
+            <div class="stack" style="gap:28px">
+                <div class="stack" style="gap:10px">
+                    <h3>Code and data</h3>
+                    <p style="font-size:23px">Notebook, CSV results and figures:<br><span style="word-break:break-all">github.com/khoiLearnsToCode/CS420_AI_LIME_SHAP</span></p>
+                    <p style="font-size:23px">Python, scikit-learn, <code>lime</code>, <code>shap</code>.</p>
+                </div>
+                <div class="stack" style="gap:10px">
+                    <h3>Use of AI tools</h3>
+                    <p style="font-size:23px">Claude (Anthropic) helped explain concepts, write experiment code and draft the report and slides. We checked every claim against the papers and every number against our CSV files.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="folio"></div>
+</section>
+
+</main>
+</div>
+
+<script>
+/* ===========================================================
+   CHART DATA (all from the team's experiment)
+   =========================================================== */
+const NS = 'http://www.w3.org/2000/svg';
+const C = { lime: '#E07B00', shap: '#2C6DB0', random: '#8C96A3', ink: '#13294B', ink2: '#4A5B74', ink3: '#66758B', rule: '#D3DBE6', paper: '#FFFFFF' };
+
+// Misclassified instance, Random Forest: contributions measured from figs_en/contrib_RandomForest.png
+const CONTRIB = {
+    lime: [['worst concave points', -0.0631], ['mean area', 0.0523], ['mean radius', 0.0432], ['mean perimeter', 0.0383],
+           ['worst concavity', -0.0251], ['worst area', 0.0222], ['mean concavity', -0.0204], ['worst symmetry', -0.0169]],
+    shap: [['worst area', 0.1134], ['worst perimeter', 0.1024], ['worst radius', 0.0813], ['mean area', 0.0461],
+           ['mean radius', 0.0431], ['mean perimeter', 0.0213], ['worst texture', 0.0039], ['mean concave points', 0.0031]]
+};
+const SHARED = new Set(['mean area', 'mean radius']);
+
+// Random Forest, borderline: share of runs in which each feature is in the top 5
+const STAB = [
+    ['worst concavity', 1.00, 1.0], ['worst texture', 1.00, 1.0], ['worst perimeter', 0.95, 1.0],
+    ['mean texture', 1.00, 0.4], ['mean concave points', 0.10, 1.0], ['worst area', 0.25, 0.4],
+    ['area error', 0.45, 0.0], ['worst concave points', 0.00, 0.2], ['worst smoothness', 0.10, 0.0],
+    ['worst compactness', 0.05, 0.0]
+];
+
+// results/deletion_curves.csv (probability of the predicted class after k removals)
+const DEL = {
+    rf: { title: 'Random Forest',
+          lime:   [0.923,0.827,0.777,0.734,0.717,0.698,0.674,0.644,0.629,0.610,0.605],
+          shap:   [0.923,0.846,0.776,0.732,0.701,0.679,0.651,0.625,0.602,0.583,0.563],
+          random: [0.923,0.918,0.909,0.899,0.888,0.877,0.869,0.857,0.847,0.839,0.830] },
+    lr: { title: 'Logistic Regression',
+          lime:   [0.941,0.914,0.892,0.865,0.836,0.802,0.753,0.716,0.675,0.634,0.579],
+          shap:   [0.941,0.915,0.889,0.865,0.836,0.805,0.774,0.731,0.693,0.639,0.584],
+          random: [0.941,0.940,0.937,0.938,0.937,0.934,0.933,0.929,0.927,0.925,0.923] }
+};
+
+/* ===========================================================
+   SVG HELPERS
+   =========================================================== */
+function el(tag, attrs, parent, text) {
+    const n = document.createElementNS(NS, tag);
+    for (const k in attrs) n.setAttribute(k, attrs[k]);
+    if (text !== undefined) n.textContent = text;
+    if (parent) parent.appendChild(n);
+    return n;
+}
+function tip(node, text) { el('title', {}, node, text); }
+// Horizontal bar with 4px rounded data end, square at the baseline
+function hbar(g, x0, x1, y, h, fill, r = 4) {
+    const L = Math.min(x0, x1), R = Math.max(x0, x1), w = R - L;
+    const rr = Math.min(r, w / 2);
+    const d = x1 >= x0
+        ? `M${L},${y}H${R - rr}Q${R},${y} ${R},${y + rr}V${y + h - rr}Q${R},${y + h} ${R - rr},${y + h}H${L}Z`
+        : `M${R},${y}H${L + rr}Q${L},${y} ${L},${y + rr}V${y + h - rr}Q${L},${y + h} ${L + rr},${y + h}H${R}Z`;
+    return el('path', { d, fill }, g);
+}
+
+/* ---------- Diverging contribution chart (one method) ---------- */
+function contribChart(svg, rows, color, domain, ticks) {
+    const W = 682, labelW = 250, left = labelW + 14, right = W - 34, top = 8, rowH = 47, barH = 30;
+    const x = v => left + (v - domain[0]) / (domain[1] - domain[0]) * (right - left);
+    const plotBottom = top + rows.length * rowH;
+    const grid = el('g', { class: 'grid' }, svg);
+    const axis = el('g', { class: 'axis' }, svg);
+    ticks.forEach(t => {
+        el('line', { x1: x(t), x2: x(t), y1: top, y2: plotBottom }, grid);
+        el('text', { x: x(t), y: plotBottom + 30, 'text-anchor': 'middle' }, axis, (t === 0 ? '0' : t.toFixed(2).replace('-', '−')));
+    });
+    rows.forEach(([name, v], i) => {
+        const y = top + i * rowH + (rowH - barH) / 2;
+        const inTop5 = i < 5;
+        const bar = hbar(svg, x(0), x(v), y, barH, color);
+        if (!inTop5) bar.setAttribute('fill-opacity', '0.35');
+        tip(bar, `${name}: ${v >= 0 ? '+' : '−'}${Math.abs(v).toFixed(3)}`);
+        const t = el('text', { x: labelW, y: y + barH / 2 + 8, 'text-anchor': 'end', 'font-size': 22,
+                               fill: inTop5 ? C.ink : C.ink3, 'font-weight': SHARED.has(name) && inTop5 ? 600 : 400 }, svg, name);
+    });
+    el('line', { class: 'zero', x1: x(0), x2: x(0), y1: top - 4, y2: plotBottom + 4 }, svg);
+    // direction cue under the axis
+    const cue = el('g', { 'font-size': 19, fill: C.ink2 }, svg);
+    if (domain[0] < 0) el('text', { x: x(0) - 10, y: plotBottom + 60, 'text-anchor': 'end' }, cue, '← towards benign');
+    el('text', { x: x(0) + 10, y: plotBottom + 60 }, cue, 'towards malignant →');
+}
+
+/* ---------- Grouped horizontal bars: top-5 frequency ---------- */
+function stabChart(svg) {
+    const W = 800, labelW = 262, left = labelW + 16, right = W - 36, top = 6, rowH = 50, barH = 19, gap = 2;
+    const x = v => left + v * (right - left);
+    const bottom = top + STAB.length * rowH;
+    const grid = el('g', { class: 'grid' }, svg), axis = el('g', { class: 'axis' }, svg);
+    [0, 0.25, 0.5, 0.75, 1].forEach(t => {
+        el('line', { x1: x(t), x2: x(t), y1: top, y2: bottom }, grid);
+        el('text', { x: x(t), y: bottom + 30, 'text-anchor': 'middle' }, axis, Math.round(t * 100) + '%');
+    });
+    STAB.forEach(([name, l, s], i) => {
+        const y = top + i * rowH + (rowH - 2 * barH - gap) / 2;
+        el('text', { x: labelW, y: y + barH + 8, 'text-anchor': 'end', 'font-size': 22, fill: C.ink }, svg, name);
+        if (l > 0) tip(hbar(svg, x(0), x(l), y, barH, C.lime), `${name}, LIME: in top 5 in ${Math.round(l * 100)}% of 20 seeds`);
+        if (s > 0) tip(hbar(svg, x(0), x(s), y + barH + gap, barH, C.shap), `${name}, SHAP: in top 5 in ${Math.round(s * 100)}% of 5 background sets`);
+    });
+    el('line', { class: 'zero', x1: x(0), x2: x(0), y1: top, y2: bottom }, svg);
+}
+
+/* ---------- Deletion curves (one panel per model) ---------- */
+function delChart(svg, d) {
+    const W = 690, H = 440, left = 78, right = W - 172, top = 54, bottom = H - 62;
+    const x = k => left + k / 10 * (right - left);
+    const y = v => bottom - (v - 0.5) / 0.5 * (bottom - top);
+    el('text', { x: left, y: 28, 'font-size': 24, 'font-weight': 600, fill: C.ink }, svg, d.title);
+    const grid = el('g', { class: 'grid' }, svg), axis = el('g', { class: 'axis' }, svg);
+    [0.5, 0.6, 0.7, 0.8, 0.9, 1.0].forEach(t => {
+        el('line', { x1: left, x2: right, y1: y(t), y2: y(t) }, grid);
+        el('text', { x: left - 12, y: y(t) + 6, 'text-anchor': 'end' }, axis, t.toFixed(1));
+    });
+    [0, 2, 4, 6, 8, 10].forEach(k => el('text', { x: x(k), y: bottom + 30, 'text-anchor': 'middle' }, axis, k));
+    el('text', { x: (left + right) / 2, y: H - 4, 'text-anchor': 'middle', 'font-size': 19, fill: C.ink2 }, svg, 'features removed');
+    el('line', { x1: left, x2: right, y1: bottom, y2: bottom, stroke: C.ink3, 'stroke-width': 1.5 }, svg);
+
+    const series = [
+        { key: 'random', name: 'Random', color: C.random, dash: '8 6', marker: null },
+        { key: 'shap', name: 'SHAP', color: C.shap, marker: 'square' },
+        { key: 'lime', name: 'LIME', color: C.lime, marker: 'circle' }
+    ];
+    series.forEach(s => {
+        const pts = d[s.key].map((v, k) => `${x(k)},${y(v)}`).join(' ');
+        el('polyline', { points: pts, fill: 'none', stroke: s.color, 'stroke-width': 3, 'stroke-linejoin': 'round',
+                         ...(s.dash ? { 'stroke-dasharray': s.dash } : {}) }, svg);
+        if (s.marker) d[s.key].forEach((v, k) => {
+            const m = s.marker === 'circle'
+                ? el('circle', { cx: x(k), cy: y(v), r: 6, fill: s.color, stroke: C.paper, 'stroke-width': 2 }, svg)
+                : el('rect', { x: x(k) - 6, y: y(v) - 6, width: 12, height: 12, fill: s.color, stroke: C.paper, 'stroke-width': 2 }, svg);
+            tip(m, `${s.name}, ${k} removed: ${v.toFixed(3)}`);
+        });
+    });
+    // Direct end labels, nudged apart so they never collide
+    const labels = series.map(s => ({ s, v: d[s.key][10], y: y(d[s.key][10]) })).sort((a, b) => a.y - b.y);
+    for (let i = 1; i < labels.length; i++) if (labels[i].y - labels[i - 1].y < 28) labels[i].y = labels[i - 1].y + 28;
+    labels.forEach(l => {
+        el('text', { x: right + 14, y: l.y + 7, 'font-size': 21, fill: C.ink }, svg, `${l.s.name} ${l.v.toFixed(3)}`);
+    });
+}
+
+/* ===========================================================
+   SLIDE PRESENTATION CONTROLLER
+   Arrows / Space / PageUp / PageDown / Home / End, swipe, wheel.
+   URL hash #n jumps to slide n (1-based); used by the export script.
+   =========================================================== */
+class SlidePresentation {
+    constructor() {
+        this.slides = Array.from(document.querySelectorAll('.slide'));
+        this.stage = document.getElementById('deckStage');
+        this.current = 0;
+        this.fillChrome();
+        this.setupStageScale();
+        this.setupKeyboardNav();
+        this.setupTouchNav();
+        this.setupWheelNav();
+        const h = parseInt(location.hash.slice(1), 10);
+        this.goToSlide(Number.isFinite(h) ? h - 1 : 0);
+        window.addEventListener('hashchange', () => {
+            const n = parseInt(location.hash.slice(1), 10);
+            if (Number.isFinite(n) && n - 1 !== this.current) this.goToSlide(n - 1);
+        });
+    }
+    // Outline in the margin column and the page numbers
+    fillChrome() {
+        const sections = ['Question', 'Background', 'Method', 'Results', 'Discussion', 'Conclusion'];
+        const total = this.slides.length;
+        this.slides.forEach((s, i) => {
+            const ul = s.querySelector('.outline');
+            if (ul) sections.forEach(name => {
+                const li = document.createElement('li');
+                li.textContent = name;
+                if (name === s.dataset.section) { li.className = 'on'; li.setAttribute('aria-current', 'step'); }
+                ul.appendChild(li);
+            });
+            const f = s.querySelector('.folio');
+            if (f) f.textContent = `${i + 1} / ${total}`;
+        });
+    }
+    setupStageScale() {
+        const scale = () => {
+            const k = Math.min(window.innerWidth / 1920, window.innerHeight / 1080);
+            const x = (window.innerWidth - 1920 * k) / 2, y = (window.innerHeight - 1080 * k) / 2;
+            this.stage.style.transform = `translate(${x}px, ${y}px) scale(${k})`;
+        };
+        scale();
+        window.addEventListener('resize', scale);
+    }
+    setupKeyboardNav() {
+        document.addEventListener('keydown', e => {
+            if (document.body.classList.contains('editing')) return;
+            if (['ArrowRight', 'ArrowDown', 'PageDown', ' '].includes(e.key)) { e.preventDefault(); this.next(); }
+            else if (['ArrowLeft', 'ArrowUp', 'PageUp'].includes(e.key)) { e.preventDefault(); this.prev(); }
+            else if (e.key === 'Home') this.goToSlide(0);
+            else if (e.key === 'End') this.goToSlide(this.slides.length - 1);
+        });
+    }
+    setupTouchNav() {
+        let sx = 0, sy = 0;
+        document.addEventListener('touchstart', e => { sx = e.touches[0].clientX; sy = e.touches[0].clientY; }, { passive: true });
+        document.addEventListener('touchend', e => {
+            const dx = e.changedTouches[0].clientX - sx, dy = e.changedTouches[0].clientY - sy;
+            if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy)) dx < 0 ? this.next() : this.prev();
+        });
+    }
+    setupWheelNav() {
+        let lock = false;
+        document.addEventListener('wheel', e => {
+            if (lock || Math.abs(e.deltaY) < 30 || document.body.classList.contains('editing')) return;
+            lock = true; setTimeout(() => lock = false, 700);
+            e.deltaY > 0 ? this.next() : this.prev();
+        }, { passive: true });
+    }
+    next() { this.goToSlide(this.current + 1); }
+    prev() { this.goToSlide(this.current - 1); }
+    goToSlide(i) {
+        this.current = Math.max(0, Math.min(i, this.slides.length - 1));
+        this.slides.forEach((s, k) => {
+            const on = k === this.current;
+            s.classList.toggle('active', on);
+            s.classList.toggle('visible', on);
+            s.setAttribute('aria-hidden', on ? 'false' : 'true');
+        });
+        const want = '#' + (this.current + 1);
+        if (location.hash !== want) history.replaceState(null, '', want);
+    }
+}
+
+/* ===========================================================
+   INLINE EDITOR: E toggles edit mode; Ctrl+S downloads a copy.
+   =========================================================== */
+const editor = {
+    isActive: false,
+    targets() { return document.querySelectorAll('.slide h1, .slide h2, .slide h3, .slide p, .slide li, .slide td, .slide dd'); },
+    toggleEditMode() {
+        this.isActive = !this.isActive;
+        document.body.classList.toggle('editing', this.isActive);
+        this.targets().forEach(n => n.setAttribute('contenteditable', this.isActive ? 'true' : 'false'));
+        const b = document.getElementById('editToggle');
+        b.classList.toggle('active', this.isActive);
+        b.textContent = this.isActive ? 'Done editing' : 'Edit text';
+    },
+    save() {
+        const wasActive = this.isActive;
+        if (wasActive) this.toggleEditMode();
+        const html = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(new Blob([html], { type: 'text/html' }));
+        a.download = 'S04_LIME_SHAP_slides.html';
+        a.click();
+        if (wasActive) this.toggleEditMode();
+    }
+};
+
+/* ===========================================================
+   BOOT
+   =========================================================== */
+contribChart(document.getElementById('contribLime'), CONTRIB.lime, C.lime, [-0.07, 0.07], [-0.06, -0.03, 0, 0.03, 0.06]);
+contribChart(document.getElementById('contribShap'), CONTRIB.shap, C.shap, [0, 0.12], [0, 0.03, 0.06, 0.09, 0.12]);
+stabChart(document.getElementById('stabChart'));
+delChart(document.getElementById('delRF'), DEL.rf);
+delChart(document.getElementById('delLR'), DEL.lr);
+
+window.presentation = new SlidePresentation();
+
+// Equations: render once KaTeX has loaded (deferred scripts)
+window.addEventListener('DOMContentLoaded', () => {
+    if (window.renderMathInElement) {
+        renderMathInElement(document.getElementById('deckStage'), {
+            delimiters: [{ left: '\\[', right: '\\]', display: true }, { left: '\\(', right: '\\)', display: false }],
+            throwOnError: false
+        });
+    }
+    document.documentElement.dataset.ready = '1';
+});
+
+// Edit-mode affordances: hover the top-left corner, click, or press E
+(() => {
+    const hot = document.querySelector('.edit-hotzone'), btn = document.getElementById('editToggle');
+    let t = null;
+    const show = () => { clearTimeout(t); btn.classList.add('show'); };
+    const hide = () => { t = setTimeout(() => { if (!editor.isActive) btn.classList.remove('show'); }, 400); };
+    hot.addEventListener('mouseenter', show); hot.addEventListener('mouseleave', hide);
+    btn.addEventListener('mouseenter', show); btn.addEventListener('mouseleave', hide);
+    hot.addEventListener('click', () => editor.toggleEditMode());
+    btn.addEventListener('click', () => editor.toggleEditMode());
+    document.addEventListener('keydown', e => {
+        if ((e.key === 'e' || e.key === 'E') && !e.target.isContentEditable && !e.ctrlKey && !e.metaKey) editor.toggleEditMode();
+        if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's') { e.preventDefault(); editor.save(); }
+    });
+})();
+</script>
+</body>
+</html>
