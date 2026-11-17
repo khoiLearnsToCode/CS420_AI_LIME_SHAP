@@ -227,8 +227,8 @@ button:focus-visible { outline: 3px solid var(--lime); outline-offset: 3px; }
     <div class="title-main">
         <div>
             <p class="course">CS420 Introduction to Artificial Intelligence, Seminar S04</p>
-            <h1 class="title-q">Does a highly accurate prediction come with a reliable explanation?</h1>
-            <p class="title-sub">Testing LIME and SHAP on breast-cancer predictions: do they agree, do they stay the same when re-run, and do they find the features that really drive the model?</p>
+            <h1 class="title-q">If a model is accurate, can we trust its explanation?</h1>
+            <p class="title-sub">We run LIME and SHAP on a breast-cancer classifier and check three things: do they agree, do they give the same answer each run, and do the features they pick actually matter to the model?</p>
         </div>
         <div class="authors">
             <div>Nguyễn Trọng Hoàng<span>24125056</span></div>
@@ -237,7 +237,7 @@ button:focus-visible { outline: 3px solid var(--lime); outline-offset: 3px; }
         </div>
     </div>
     <aside class="title-panel" aria-label="LIME and SHAP top-5 features for the misclassified tumour">
-        <h3>One misclassified tumour, two explanations</h3>
+        <h3>One wrong prediction, explained twice</h3>
         <svg class="chart tie" viewBox="0 0 560 440" width="560" height="440" role="img"
              aria-label="Top-5 features: LIME and SHAP share only mean area and mean radius">
             <text class="hdr" x="258" y="28" text-anchor="end" fill="#A35700">LIME top 5</text>
@@ -261,7 +261,7 @@ button:focus-visible { outline: 3px solid var(--lime); outline-offset: 3px; }
             <path class="link l1" d="M266 162 C290 162, 292 302, 314 302"/>
             <path class="link l2" d="M266 232 C290 232, 292 372, 314 372"/>
         </svg>
-        <p class="fig-caption" style="margin-top:28px;max-width:540px">Random Forest says P(malignant) = 0.745; the tumour is benign. The two methods share 2 of their 5 most important features.</p>
+        <p class="fig-caption" style="margin-top:28px;max-width:540px">Random Forest gives P(malignant) = 0.745, but the tumour is actually benign. LIME and SHAP only have 2 features in common in their top 5.</p>
     </aside>
 </section>
 
@@ -272,11 +272,11 @@ button:focus-visible { outline: 3px solid var(--lime); outline-offset: 3px; }
     <aside class="rail"><ul class="outline"></ul>
         <p class="source"><b>Sources</b>Data: Street et al. (1993). Accuracy and instances: our experiment.</p></aside>
     <div class="body" style="gap:30px">
-        <h2 class="headline">We judge an explanation on three things, not on the model’s accuracy</h2>
+        <h2 class="headline">Model accuracy tells us nothing about the explanation, so we test three things</h2>
         <div class="cols" style="grid-template-columns:repeat(3,1fr);gap:56px">
-            <div class="stack" style="gap:10px"><h3>Useful</h3><p>It shows which features push the prediction up or down.</p></div>
-            <div class="stack" style="gap:10px"><h3>Stable</h3><p>It stays the same when the random seed or background data change.</p></div>
-            <div class="stack" style="gap:10px"><h3>Faithful</h3><p>Removing the features it ranks highest really changes the prediction.</p></div>
+            <div class="stack" style="gap:10px"><h3>Useful</h3><p>Tells us which features raise or lower the prediction.</p></div>
+            <div class="stack" style="gap:10px"><h3>Stable</h3><p>Gives the same result if we change the random seed or the background data.</p></div>
+            <div class="stack" style="gap:10px"><h3>Faithful</h3><p>If we remove its top features, the prediction should change a lot.</p></div>
         </div>
         <div class="cols" style="grid-template-columns:0.9fr 1.1fr;gap:64px;border-top:1px solid var(--rule);padding-top:40px">
             <div class="stack" style="gap:18px">
@@ -289,7 +289,7 @@ button:focus-visible { outline: 3px solid var(--lime); outline-offset: 3px; }
                 </ul>
             </div>
             <div class="stack" style="gap:14px">
-                <h3>Three test instances, chosen by a fixed rule</h3>
+                <h3>Three test cases, picked by a fixed rule</h3>
                 <table class="tbl">
                     <thead><tr><th>Instance</th><th>True label</th><th class="r">P(mal.)<br>RF</th><th class="r">P(mal.)<br>LR</th></tr></thead>
                     <tbody>
@@ -298,7 +298,7 @@ button:focus-visible { outline: 3px solid var(--lime); outline-offset: 3px; }
                         <tr><td>Misclassified <span class="muted">(by RF)</span></td><td>benign</td><td class="r hi">0.745 ✗</td><td class="r">0.466</td></tr>
                     </tbody>
                 </table>
-                <p class="small">✗ = that model calls a benign tumour malignant. The third instance is wrong for <b>RF only</b>; on the borderline instance it is <b>LR</b> that errs.</p>
+                <p class="small">✗ = the model predicts malignant for a benign tumour. <b>RF</b> gets the third case wrong; <b>LR</b> gets the borderline case wrong.</p>
             </div>
         </div>
     </div>
@@ -312,23 +312,23 @@ button:focus-visible { outline: 3px solid var(--lime); outline-offset: 3px; }
     <aside class="rail"><ul class="outline"></ul>
         <p class="source"><b>Sources</b>Mersha et al. (2024); Ribeiro et al. (2016); Lundberg &amp; Lee (2017).</p></aside>
     <div class="body">
-        <h2 class="headline">LIME and SHAP explain one prediction after training, for any model</h2>
+        <h2 class="headline">LIME and SHAP explain single predictions of an already-trained model</h2>
         <div class="cols" style="grid-template-columns:0.94fr 1.06fr;gap:56px">
             <div class="stack" style="gap:16px">
-                <h3>Four distinctions <span class="sub">— and where the two methods fall</span></h3>
+                <h3>Four ways to group XAI methods <span class="sub">(and where LIME and SHAP fit)</span></h3>
                 <ul class="list" style="gap:16px">
-                    <li style="font-size:25px"><b>Explainability vs. interpretability</b> — reasons for one decision vs. how the whole model works. <span class="small">Both give explainability; the model stays a black box.</span></li>
-                    <li style="font-size:25px"><b>Local vs. global</b> — one instance vs. the whole model. <span class="small">Both local; SP-LIME picks representative instances for a global view.</span></li>
-                    <li style="font-size:25px"><b>Model-specific vs. model-agnostic</b> — uses the model’s structure vs. only its prediction function. <span class="small">LIME and KernelSHAP are agnostic; Linear and Deep SHAP are specific.</span></li>
-                    <li style="font-size:25px"><b>Intrinsic vs. post-hoc</b> — understandable by design vs. explained after training. <span class="small">Both post-hoc and perturbation-based.</span></li>
+                    <li style="font-size:25px"><b>Explainability vs. interpretability:</b> explaining one decision vs. understanding the whole model. <span class="small">Both do the first; the model itself stays a black box.</span></li>
+                    <li style="font-size:25px"><b>Local vs. global:</b> one instance vs. the whole model. <span class="small">Both are local, but SP-LIME picks a few typical instances to give a global view.</span></li>
+                    <li style="font-size:25px"><b>Model-specific vs. model-agnostic:</b> looks inside the model vs. only calls its prediction function. <span class="small">LIME and KernelSHAP are agnostic; Linear SHAP and Deep SHAP are model-specific.</span></li>
+                    <li style="font-size:25px"><b>Intrinsic vs. post-hoc:</b> interpretable by design vs. explained after training. <span class="small">Both are post-hoc and work by perturbing the input.</span></li>
                 </ul>
             </div>
             <div class="stack" style="gap:16px">
-                <h3>The three sources <span class="sub">— goal, contribution, limitation</span></h3>
+                <h3>Our three main papers <span class="sub">(goal, contribution, limitation)</span></h3>
                 <ul class="list" style="gap:16px">
-                    <li style="font-size:25px"><b>Ribeiro et al. (2016)</b> — <i>Goal:</i> explain any classifier so people can decide whether to trust it. <i>Contribution:</i> LIME, a sparse locally weighted surrogate, plus SP-LIME. <span class="small"><i>Limit:</i> kernel and σ chosen heuristically; no Shapley-style guarantees.</span></li>
-                    <li style="font-size:25px"><b>Lundberg &amp; Lee (2017)</b> — <i>Goal:</i> unify existing feature-attribution methods. <i>Contribution:</i> the additive attribution class, its unique solution (Shapley values) and KernelSHAP. <span class="small"><i>Limit:</i> assumes feature independence; depends on the background data.</span></li>
-                    <li style="font-size:25px"><b>Mersha et al. (2024)</b> — <i>Goal:</i> survey XAI. <i>Contribution:</i> four axes (scope, stage, applicability, design) and five criteria: fidelity, consistency, robustness, efficiency, sufficiency. <span class="small"><i>Limit:</i> covers LIME and SHAP only briefly; we use its criteria in spirit, not its formulas.</span></li>
+                    <li style="font-size:25px"><b>Ribeiro et al. (2016).</b> <i>Goal:</i> explain any classifier so users can decide whether to trust it. <i>Contribution:</i> LIME (a sparse linear model fitted around one input) and SP-LIME. <span class="small"><i>Limit:</i> the kernel and σ are set by heuristics, with no guarantees like Shapley values have.</span></li>
+                    <li style="font-size:25px"><b>Lundberg &amp; Lee (2017).</b> <i>Goal:</i> put existing attribution methods into one framework. <i>Contribution:</i> additive feature attributions, a proof that Shapley values are the only solution, and KernelSHAP. <span class="small"><i>Limit:</i> assumes independent features; results depend on the background data.</span></li>
+                    <li style="font-size:25px"><b>Mersha et al. (2024).</b> <i>Goal:</i> survey the XAI field. <i>Contribution:</i> four axes (scope, stage, applicability, design) and five criteria: fidelity, consistency, robustness, efficiency, sufficiency. <span class="small"><i>Limit:</i> only a short part on LIME and SHAP; we borrow its criteria loosely, not its exact formulas.</span></li>
                 </ul>
             </div>
         </div>
@@ -343,12 +343,12 @@ button:focus-visible { outline: 3px solid var(--lime); outline-offset: 3px; }
     <aside class="rail"><ul class="outline"></ul>
         <p class="source"><b>Sources</b>Method and equation: Ribeiro, Singh &amp; Guestrin (2016), KDD. Local-accuracy critique: Lundberg &amp; Lee (2017). Discretisation: the <code>lime</code> library.</p></aside>
     <div class="body">
-        <h2 class="headline">LIME fits a simple model that imitates the black box near one input</h2>
+        <h2 class="headline">LIME copies the model around one input with a simple linear model</h2>
         <div class="cols" style="grid-template-columns:0.74fr 1.26fr;gap:56px">
             <ol class="steps" style="gap:26px">
-                <li><span><b>Perturb</b>Sample points \(z\) near \(x\) and query \(f(z)\); 5000 by default.</span></li>
-                <li><span><b>Weight</b>Closer samples count more, via the kernel \(\pi_x\).</span></li>
-                <li><span><b>Fit</b>Fit a sparse weighted linear \(g\); its weights are the explanation.</span></li>
+                <li><span><b>Perturb</b>Generate points \(z\) around \(x\) and get \(f(z)\) for each (5000 by default).</span></li>
+                <li><span><b>Weight</b>Points closer to \(x\) get a higher weight from the kernel \(\pi_x\).</span></li>
+                <li><span><b>Fit</b>Fit a sparse weighted linear model \(g\). Its coefficients are the explanation.</span></li>
             </ol>
             <div class="stack" style="gap:24px">
                 <div class="box eq">
@@ -358,13 +358,13 @@ button:focus-visible { outline: 3px solid var(--lime); outline-offset: 3px; }
                 <dl class="defs">
                     <dt>\(f,\ x\)</dt><dd>black box, \(f(x)\in[0,1]\) is P(malignant); instance \(x\in\mathbb{R}^{30}\)</dd>
                     <dt>\(z,\ z'\)</dt><dd>perturbed sample; its on/off form \(z'\in\{0,1\}^N\)</dd>
-                    <dt>\(\pi_x,\ \sigma\)</dt><dd>weight in \((0,1]\); width \(\sigma&gt;0\): too small is noisy, too large is no longer local</dd>
+                    <dt>\(\pi_x,\ \sigma\)</dt><dd>weight in \((0,1]\); width \(\sigma&gt;0\): too small gives noisy results, too large stops being local</dd>
                     <dt>\(G,\ \Omega\)</dt><dd>linear models; \(\Omega(g)=\infty\cdot\mathbb{1}[\lVert w_g\rVert_0&gt;K]\) keeps at most \(K\) features</dd>
                     <dt>\(L\)</dt><dd>weighted squared error, \(L\ge 0\), in squared probability units</dd>
                 </dl>
             </div>
         </div>
-        <p class="small" style="max-width:1360px"><b>From Ribeiro et al.:</b> the kernel and \(\sigma\) are chosen heuristically, with no Shapley-style guarantee. <b>From Lundberg &amp; Lee:</b> those heuristic choices can break local accuracy, so LIME's weights need not add up to the prediction — a point the LIME paper itself does not make. <b>Implementation note (ours):</b> the <code>lime</code> library discretises continuous features by default, so a weight describes the value range the instance falls in.</p>
+        <p class="small" style="max-width:1360px"><b>From Ribeiro et al.:</b> the kernel and \(\sigma\) are set by heuristics, so there is no guarantee like Shapley values have. <b>From Lundberg &amp; Lee:</b> because of these heuristics, LIME can lose local accuracy, so its weights don't have to add up to the prediction. The LIME paper itself doesn't mention this. <b>Our note:</b> the <code>lime</code> library discretises continuous features by default, so each weight refers to the value range the instance falls into.</p>
     </div>
     <div class="folio"></div>
 </section>
@@ -376,7 +376,7 @@ button:focus-visible { outline: 3px solid var(--lime); outline-offset: 3px; }
     <aside class="rail"><ul class="outline"></ul>
         <p class="source"><b>Source</b>Equations, Theorems 1 and 2: Lundberg &amp; Lee (2017), NeurIPS.</p></aside>
     <div class="body">
-        <h2 class="headline">SHAP splits the prediction exactly among the features</h2>
+        <h2 class="headline">SHAP divides the prediction among the features, and the parts add up exactly</h2>
         <div class="cols" style="grid-template-columns:1.08fr 0.92fr;gap:60px">
             <div class="stack" style="gap:22px">
                 <div class="box eq">
@@ -386,30 +386,30 @@ button:focus-visible { outline: 3px solid var(--lime); outline-offset: 3px; }
                 <dl class="defs" style="grid-template-columns:110px 1fr">
                     <dt>\(M,\ F\)</dt><dd>number of features (30) and the set of all features</dd>
                     <dt>\(S,\ f_S\)</dt><dd>a subset without \(j\); prediction when only \(S\) is known, the rest averaged over background data</dd>
-                    <dt>\(\varphi_j\)</dt><dd>a change in probability, \(\varphi_0\in[0,1]\), \(\varphi_j\in[-1,1]\)</dd>
+                    <dt>\(\varphi_j\)</dt><dd>measured in probability: \(\varphi_0\in[0,1]\), \(\varphi_j\in[-1,1]\)</dd>
                 </dl>
             </div>
             <div class="stack" style="gap:26px">
                 <div class="stack" style="gap:10px">
-                    <h3>Theorem 1: the only additive attribution with</h3>
+                    <h3>Theorem 1: only one additive attribution has</h3>
                     <ul class="list" style="gap:8px">
-                        <li><b>local accuracy</b>, \(g(x')=f(x)\)</li>
-                        <li><b>missingness</b>, an absent feature gets 0</li>
-                        <li><b>consistency</b>, more influence never lowers credit</li>
+                        <li><b>local accuracy:</b> \(g(x')=f(x)\)</li>
+                        <li><b>missingness:</b> a missing feature gets 0</li>
+                        <li><b>consistency:</b> if a feature matters more, its credit never drops</li>
                     </ul>
                 </div>
                 <div class="stack" style="gap:10px">
-                    <h3>Reading a SHAP explanation</h3>
+                    <h3>How to read SHAP values</h3>
                     <ul class="list" style="gap:8px">
-                        <li><b>Baseline</b> \(\varphi_0=\mathbb{E}[f(X)]\) over the background</li>
-                        <li><b>Contribution</b> \(\varphi_0+\sum_j\varphi_j=f(x)\) exactly</li>
-                        <li><b>Sign</b>: positive pushes above the baseline</li>
+                        <li><b>Baseline:</b> \(\varphi_0=\mathbb{E}[f(X)]\), the average prediction on the background</li>
+                        <li><b>Sum:</b> \(\varphi_0+\sum_j\varphi_j=f(x)\), always</li>
+                        <li><b>Sign:</b> positive means the feature pushes the prediction above the baseline</li>
                     </ul>
                 </div>
             </div>
         </div>
         <div class="box" style="padding:22px 32px">
-            <p style="font-size:24px"><b>How the two papers connect.</b> KernelSHAP is LIME with a specific kernel, loss and regulariser (Theorem 2); LIME’s heuristic choices can break local accuracy or consistency. KernelSHAP assumes features are independent, and its result depends on the background data.</p>
+            <p style="font-size:24px"><b>How the two papers connect.</b> Theorem 2 shows that KernelSHAP is just LIME with a particular kernel, loss and regulariser. With LIME’s heuristic choices instead, local accuracy or consistency can fail. On the other hand, KernelSHAP assumes the features are independent, and its result depends on the background data.</p>
         </div>
     </div>
     <div class="folio"></div>
@@ -422,7 +422,7 @@ button:focus-visible { outline: 3px solid var(--lime); outline-offset: 3px; }
     <aside class="rail"><ul class="outline"></ul>
         <p class="source"><b>Source</b>Worked example by the team; closed form from Lundberg &amp; Lee (2017).</p></aside>
     <div class="body">
-        <h2 class="headline">Worked example 1: SHAP contributions add up to the prediction</h2>
+        <h2 class="headline">Worked example 1: SHAP values add up to the prediction</h2>
         <div class="cols" style="grid-template-columns:1.2fr 0.8fr;gap:56px">
             <div class="stack" style="gap:22px">
                 <div class="box" style="font-size:26px;line-height:1.55;padding:24px 32px">
@@ -436,7 +436,7 @@ button:focus-visible { outline: 3px solid var(--lime); outline-offset: 3px; }
                     <li><b>Contributions</b> \(\varphi_1=2(3-1)=4,\ \varphi_2=(-1)(1-2)=1,\ \varphi_3=0.5(6-4)=1\)</li>
                     <li><b>Check</b> \(3+4+1+1=9=f(x)\); the full Shapley sum gives the same \((4,1,1)\)</li>
                 </ul>
-                <p class="small">Feature 2 has a negative weight but a positive contribution, because \(x_2\) is below its mean. The sign depends on the weight <i>and</i> on where the instance lies.</p>
+                <p class="small">Look at feature 2: its weight is negative, but its contribution is positive because \(x_2\) is below its mean. So the sign depends on both the weight <i>and</i> the instance’s value.</p>
             </div>
             <svg class="chart" viewBox="0 0 620 560" width="540" height="488" style="margin-top:20px" role="img" aria-label="Waterfall: baseline 3 plus 4 plus 1 plus 1 equals prediction 9">
                 <g class="grid">
@@ -484,7 +484,7 @@ button:focus-visible { outline: 3px solid var(--lime); outline-offset: 3px; }
     <aside class="rail"><ul class="outline"></ul>
         <p class="source"><b>Source</b>Worked example by the team, checked with NumPy; method from Ribeiro et al. (2016).</p></aside>
     <div class="body">
-        <h2 class="headline">Worked example 2: LIME recovers the local slopes, approximately</h2>
+        <h2 class="headline">Worked example 2: LIME gets close to the true local slopes</h2>
         <div class="cols" style="grid-template-columns:0.95fr 1.05fr;gap:60px">
             <div class="stack" style="gap:22px">
                 <div class="box" style="font-size:26px;line-height:1.6">
@@ -518,7 +518,7 @@ button:focus-visible { outline: 3px solid var(--lime); outline-offset: 3px; }
                 </table>
             </div>
         </div>
-        <p class="small" style="max-width:1360px">\(g_1\) is almost exact; \(g_2\) has the right sign but is off by 0.05, because 6 points cannot capture the curvature of \(f\). Even this small example shows that a LIME explanation depends on the perturbation sample.</p>
+        <p class="small" style="max-width:1360px">\(g_1\) is almost exact. \(g_2\) has the right sign but is off by about 0.05, since 6 points are not enough to capture the curvature of \(f\). So even in this toy case, the result depends on which points we sample.</p>
     </div>
     <div class="folio"></div>
 </section>
@@ -530,7 +530,7 @@ button:focus-visible { outline: 3px solid var(--lime); outline-offset: 3px; }
     <aside class="rail"><ul class="outline"></ul>
         <p class="source"><b>Source</b>Our experiment, results/<wbr>compare_lime_shap.csv.</p></aside>
     <div class="body" style="gap:30px">
-        <h2 class="headline">The two methods agree less as the prediction gets harder</h2>
+        <h2 class="headline">LIME and SHAP agree less on harder cases</h2>
         <table class="tbl tight" style="table-layout:fixed">
             <colgroup><col style="width:7%"><col style="width:18%"><col style="width:13%"><col style="width:9%"><col style="width:20%"><col style="width:18%"><col style="width:15%"></colgroup>
             <thead><tr><th>Model</th><th>Instance</th><th class="c">Overlap@5<br><span style="font-weight:400">main / avg</span></th><th class="c">Spearman ρ</th><th>Top-1 LIME</th><th>Top-1 SHAP</th><th class="r">Runtime (s)<br><span style="font-weight:400">LIME / SHAP</span></th></tr></thead>
@@ -544,11 +544,11 @@ button:focus-visible { outline: 3px solid var(--lime); outline-offset: 3px; }
             </tbody>
         </table>
         <div class="cols" style="grid-template-columns:repeat(3,1fr);gap:48px">
-            <div class="stack" style="gap:8px"><h3>Which features, not which direction</h3><p style="font-size:24px">Overlap@5 falls from 0.8–1.0 to 0.4. When both pick a feature, they always give it the same sign.</p></div>
-            <div class="stack" style="gap:8px"><h3>Even the linear model</h3><p style="font-size:24px">Rankings differ most for LR on hard cases (ρ = 0.24, 0.26), possibly because LIME discretises features (untested).</p></div>
-            <div class="stack" style="gap:8px"><h3>KernelSHAP costs more</h3><p style="font-size:24px">On RF it is 6–7× slower than LIME: 2000 coalitions × 100 background rows. One machine, ±20%.</p></div>
+            <div class="stack" style="gap:8px"><h3>Different features, same signs</h3><p style="font-size:24px">Overlap@5 drops from 0.8–1.0 to 0.4. But when both pick the same feature, the sign always matches.</p></div>
+            <div class="stack" style="gap:8px"><h3>Low agreement even for LR</h3><p style="font-size:24px">LR has the lowest ρ on hard cases (0.24, 0.26). LIME’s discretisation might be the reason, but we didn’t test it.</p></div>
+            <div class="stack" style="gap:8px"><h3>KernelSHAP is slower</h3><p style="font-size:24px">On RF it takes 6–7× longer than LIME (2000 coalitions × 100 background rows). Timed on one machine, about ±20%.</p></div>
         </div>
-        <p class="small" style="margin-top:-12px">Overlap@5 = shared features in the two top-5 sets ÷ 5. Spearman ρ compares the rankings of all 30 features by |contribution|.</p>
+        <p class="small" style="margin-top:-12px">Overlap@5 = number of shared features in the two top-5 lists ÷ 5. Spearman ρ compares how the two methods rank all 30 features by |contribution|.</p>
     </div>
     <div class="folio"></div>
 </section>
@@ -558,10 +558,10 @@ button:focus-visible { outline: 3px solid var(--lime); outline-offset: 3px; }
      ========================================================= -->
 <section class="slide" data-section="Results">
     <aside class="rail"><ul class="outline"></ul>
-        <p class="source"><b>Source</b>Our experiment: <code>S04_LIME_SHAP_</code><wbr><code>experiments.ipynb</code>, LIME seed 0 and KernelSHAP background 0 — the runs plotted in the report.</p></aside>
+        <p class="source"><b>Source</b>Our experiment: <code>S04_LIME_SHAP_</code><wbr><code>experiments.ipynb</code>, LIME seed 0 and KernelSHAP background 0 (same runs as in the report).</p></aside>
     <div class="body" style="gap:16px">
-        <h2 class="headline">On the misclassified tumour, the two methods tell different stories</h2>
-        <p class="small" style="color:var(--ink)">Random Forest, test index 3: P(malignant) = 0.745, but the tumour is benign. Top 8 features; the top 5 are solid, shared features in bold. <b>Note the two axes differ</b> (LIME −0.06…0.06, SHAP 0…0.12) and LIME discretises features — compare ranks and signs, not bar lengths.</p>
+        <h2 class="headline">On the misclassified tumour, LIME and SHAP give different explanations</h2>
+        <p class="small" style="color:var(--ink)">Random Forest, test index 3: P(malignant) = 0.745, but the tumour is benign. Top 8 features shown (top 5 in solid colour, shared ones in bold). <b>The two axes have different scales</b> (LIME −0.06…0.06, SHAP 0…0.12) and LIME discretises features, so compare ranks and signs only, not bar lengths.</p>
         <div class="cols c2" style="gap:56px">
             <div class="stack" style="gap:4px">
                 <span class="key"><i class="l"></i>LIME</span>
@@ -573,10 +573,10 @@ button:focus-visible { outline: 3px solid var(--lime); outline-offset: 3px; }
             </div>
         </div>
         <div class="cols c2" style="gap:56px">
-            <p style="font-size:23px">LIME’s top feature, <b>worst concave points</b>, pushes towards benign, while size features push towards malignant: a mixed picture.</p>
-            <p style="font-size:23px">SHAP puts the blame almost entirely on <b>size features</b>, all pushing towards malignant. Overlap@5 = 0.4.</p>
+            <p style="font-size:23px">LIME’s top feature, <b>worst concave points</b>, points towards benign, while the size features point towards malignant. The evidence is split.</p>
+            <p style="font-size:23px">SHAP’s top features are almost all <b>size features</b>, and every one points towards malignant. Overlap@5 = 0.4.</p>
         </div>
-        <p class="small" style="max-width:1400px"><b>SHAP still adds up exactly:</b> φ₀ = 0.326 + Σφ = 0.419 = f(x) = 0.745, as local accuracy requires. <b>They do agree when the case is easy:</b> on the confidently correct instance both put worst area, worst perimeter, worst radius and worst concave points first, all towards malignant (Overlap@5 = 0.8).</p>
+        <p class="small" style="max-width:1400px"><b>SHAP values still add up:</b> φ₀ = 0.326 + Σφ = 0.419 = f(x) = 0.745, as local accuracy says they should. <b>On the easy case they mostly agree:</b> for the confidently correct instance, both rank worst area, worst perimeter, worst radius and worst concave points at the top, all towards malignant (Overlap@5 = 0.8).</p>
     </div>
     <div class="folio"></div>
 </section>
@@ -588,7 +588,7 @@ button:focus-visible { outline: 3px solid var(--lime); outline-offset: 3px; }
     <aside class="rail"><ul class="outline"></ul>
         <p class="source"><b>Source</b>Our experiment, results/stability.csv, sensitivity.csv; LIME 20 seeds, SHAP 5 background sets.</p></aside>
     <div class="body" style="gap:32px">
-        <h2 class="headline">Re-running changes the explanation, and tuning does not fix it</h2>
+        <h2 class="headline">Explanations change between runs, and tuning doesn’t fix it</h2>
         <div class="cols" style="grid-template-columns:1.02fr 0.98fr;gap:48px">
             <div class="stack" style="gap:16px">
                 <table class="tbl tight" style="font-size:22px">
@@ -602,18 +602,18 @@ button:focus-visible { outline: 3px solid var(--lime); outline-offset: 3px; }
                         <tr><td>RF</td><td>Misclassified</td><td class="r">0.74 / 1.00</td><td class="r">1.00 / 1.00</td></tr>
                     </tbody>
                 </table>
-                <p class="small">Mean Jaccard of the top-5 sets over all run pairs / share of runs agreeing on the first-ranked feature. Both are 1 under full agreement.</p>
+                <p class="small">Jaccard = average overlap of the top-5 sets across all pairs of runs. Top-1 = fraction of runs with the same #1 feature. Both are 1 if every run agrees.</p>
                 <ul class="list" style="gap:12px">
-                    <li style="font-size:23px"><b>Neither is always more stable:</b> LIME 0.72–0.94, SHAP 0.53–1.00.</li>
-                    <li style="font-size:23px"><b>The top feature can flip on easy cases:</b> 0.60 for LIME (RF), 0.40 for SHAP (LR).</li>
-                    <li style="font-size:23px"><b>Tuning does not help:</b> background 10–100, kernel width 1–8, Jaccard never above 0.73.</li>
+                    <li style="font-size:23px"><b>Neither method is always more stable:</b> LIME 0.72–0.94, SHAP 0.53–1.00.</li>
+                    <li style="font-size:23px"><b>The #1 feature can change even on easy cases:</b> 0.60 for LIME (RF), 0.40 for SHAP (LR).</li>
+                    <li style="font-size:23px"><b>Tuning didn’t help:</b> with background 10–100 and kernel width 1–8, Jaccard never went above 0.73.</li>
                 </ul>
             </div>
             <div class="stack" style="gap:8px">
-                <h3>Random Forest, borderline: share of runs where each feature is in the top 5</h3>
+                <h3>Random Forest, borderline case: how often each feature is in the top 5</h3>
                 <div><span class="key"><i class="l"></i>LIME, 20 seeds</span><span class="key"><i class="s"></i>SHAP, 5 background sets</span></div>
                 <svg class="chart" id="stabChart" width="672" height="462" viewBox="0 0 800 550" role="img" aria-label="Top-5 frequency per feature for LIME and SHAP"></svg>
-                <p class="small"><b>Concretely:</b> LIME seed 0 ranks worst concavity first, while seeds 1–5 rank worst texture first. SHAP keeps mean concave points in every run; LIME picks it in only 10%.</p>
+                <p class="small"><b>For example:</b> LIME with seed 0 ranks worst concavity first, but seeds 1–5 rank worst texture first. SHAP has mean concave points in the top 5 every time; LIME has it in only 10% of runs.</p>
             </div>
         </div>
     </div>
@@ -627,8 +627,8 @@ button:focus-visible { outline: 3px solid var(--lime); outline-offset: 3px; }
     <aside class="rail"><ul class="outline"></ul>
         <p class="source"><b>Source</b>Our experiment, results/deletion_curves.csv; 20 test instances, one seed.</p></aside>
     <div class="body" style="gap:24px">
-        <h2 class="headline">Both methods find influential features far better than chance, but neither beats the other</h2>
-        <p style="font-size:25px;max-width:1360px">Remove the top-ranked features one at a time (replace with the training mean) and watch the probability of the predicted class. A faithful ranking makes it fall fast. Baseline: random order, 10 permutations.</p>
+        <h2 class="headline">Both methods do much better than random, but we can’t tell which one is better</h2>
+        <p style="font-size:25px;max-width:1360px">We remove the top-ranked features one by one (set to the training mean) and track the probability of the predicted class. A faithful ranking should make it drop fast. Baseline: random order, 10 permutations.</p>
         <div>
             <span class="key"><i class="l"></i>LIME order</span><span class="key"><i class="s"></i>SHAP order</span><span class="key"><i class="r"></i>Random order</span>
         </div>
@@ -636,7 +636,7 @@ button:focus-visible { outline: 3px solid var(--lime); outline-offset: 3px; }
             <svg class="chart" id="delRF" width="690" height="440" viewBox="0 0 690 440" role="img" aria-label="Deletion curves, Random Forest"></svg>
             <svg class="chart" id="delLR" width="690" height="440" viewBox="0 0 690 440" role="img" aria-label="Deletion curves, Logistic Regression"></svg>
         </div>
-        <p style="font-size:24px;max-width:1380px">After 5 removals the gap between LIME and SHAP is at most 0.02, and 0.04 after 10: too small to rank them with one seed, 20 instances and no confidence intervals. <span class="muted" style="color:var(--ink-2)">Caveat: mean replacement can create unrealistic inputs, and correlated features keep each other’s information.</span></p>
+        <p style="font-size:24px;max-width:1380px">After 5 removals, LIME and SHAP differ by at most 0.02 (0.04 after 10). With one seed, 20 instances and no confidence intervals, that gap is too small to pick a winner. <span class="muted" style="color:var(--ink-2)">Caveat: replacing with the mean can create unrealistic inputs, and correlated features can still carry each other’s information.</span></p>
     </div>
     <div class="folio"></div>
 </section>
@@ -648,19 +648,19 @@ button:focus-visible { outline: 3px solid var(--lime); outline-offset: 3px; }
     <aside class="rail"><ul class="outline"></ul>
         <p class="source"><b>Sources</b>Criteria adapted from Mersha et al. (2024); procedure proposed by the team.</p></aside>
     <div class="body" style="gap:30px">
-        <h2 class="headline">An importance score says what the model relies on, not what causes cancer</h2>
+        <h2 class="headline">Feature importance shows what the model uses, not what causes cancer</h2>
         <div class="cols" style="grid-template-columns:0.92fr 1.08fr;gap:64px">
             <div class="stack" style="gap:18px">
-                <h3>Why importance is not a causal effect</h3>
+                <h3>Why importance is not causation</h3>
                 <ul class="list" style="gap:16px">
-                    <li style="font-size:24px"><b>Correlated features.</b> Worst radius, perimeter and area grow together; how credit is split depends on the model and background.</li>
-                    <li style="font-size:24px"><b>Unrealistic samples.</b> Both change features independently of one another — for KernelSHAP this is the feature-independence assumption — making combinations that never occur in real tumours, e.g. a large area with a small radius, so the model is queried where it has never seen data.</li>
-                    <li style="font-size:24px"><b>Model mistakes.</b> On the misclassified tumour, size features explain the error, not malignancy.</li>
-                    <li style="font-size:24px"><b>No real intervention.</b> Replacing a value is a computation on the model, not a change to a tumour.</li>
+                    <li style="font-size:24px"><b>Correlated features.</b> Worst radius, perimeter and area increase together, so how the credit is split between them depends on the model and the background data.</li>
+                    <li style="font-size:24px"><b>Unrealistic samples.</b> Both methods change each feature on its own (for KernelSHAP, this is the independence assumption). This creates combinations no real tumour has, like a large area with a small radius, so the model is asked about inputs it never saw.</li>
+                    <li style="font-size:24px"><b>Model mistakes.</b> On the misclassified tumour, the size features explain why the model was wrong. They say nothing about malignancy.</li>
+                    <li style="font-size:24px"><b>No real intervention.</b> Changing a value only changes the model’s input. Nothing happens to an actual tumour.</li>
                 </ul>
             </div>
             <div class="stack" style="gap:18px">
-                <h3>Proposed check before trusting an explanation</h3>
+                <h3>Checks we suggest before trusting an explanation</h3>
                 <table class="tbl">
                     <thead><tr><th>Step</th><th>Criterion</th><th>Status here</th></tr></thead>
                     <tbody>
@@ -671,7 +671,7 @@ button:focus-visible { outline: 3px solid var(--lime); outline-offset: 3px; }
                         <tr><td>5. Small input changes, similar models</td><td>robustness</td><td><span class="status"><i></i>Not done</span></td></tr>
                     </tbody>
                 </table>
-                <p class="small">Trust an explanation only if it passes several checks together.</p>
+                <p class="small">One check alone is not enough. An explanation should pass several of them.</p>
             </div>
         </div>
     </div>
@@ -685,30 +685,30 @@ button:focus-visible { outline: 3px solid var(--lime); outline-offset: 3px; }
     <aside class="rail"><ul class="outline"></ul>
         <p class="source"><b>Source</b>Our experiment and report.</p></aside>
     <div class="body" style="gap:44px">
-        <h2 class="headline">No: a 98% accurate model can still give an unreliable explanation</h2>
+        <h2 class="headline">So, no: a model can be 98% accurate and still have unreliable explanations</h2>
         <div class="cols" style="grid-template-columns:repeat(3,1fr);gap:56px">
-            <div class="stack" style="gap:10px"><h3>Agreement</h3><p style="font-size:25px">On the misclassified tumour LIME and SHAP share only <b class="num">2 of 5</b> top features.</p></div>
-            <div class="stack" style="gap:10px"><h3>Stability</h3><p style="font-size:25px">Top-5 sets change between runs: mean Jaccard as low as <b class="num">0.53</b> (SHAP) and <b class="num">0.72</b> (LIME).</p></div>
-            <div class="stack" style="gap:10px"><h3>Faithfulness</h3><p style="font-size:25px">Both beat random deletion clearly; neither is shown to be more faithful, and neither reveals causes.</p></div>
+            <div class="stack" style="gap:10px"><h3>Agreement</h3><p style="font-size:25px">For the misclassified tumour, LIME and SHAP have only <b class="num">2 of 5</b> top features in common.</p></div>
+            <div class="stack" style="gap:10px"><h3>Stability</h3><p style="font-size:25px">The top 5 changes from run to run. Mean Jaccard goes down to <b class="num">0.53</b> (SHAP) and <b class="num">0.72</b> (LIME).</p></div>
+            <div class="stack" style="gap:10px"><h3>Faithfulness</h3><p style="font-size:25px">Both clearly beat random deletion, but we couldn’t show one is more faithful. Neither tells us about causes.</p></div>
         </div>
         <div class="cols c2" style="gap:64px;border-top:1px solid var(--rule);padding-top:40px">
             <div class="stack" style="gap:14px">
-                <h3>Conditions of use</h3>
+                <h3>When using LIME or SHAP</h3>
                 <ul class="list" style="gap:10px">
                     <li style="font-size:24px">Report the seed, background data and kernel width</li>
-                    <li style="font-size:24px">Repeat the explanation and report its stability</li>
-                    <li style="font-size:24px">Run the checks above, above all for borderline and wrong predictions</li>
+                    <li style="font-size:24px">Run it several times and report how stable it is</li>
+                    <li style="font-size:24px">Run the checks above, especially for borderline and wrong predictions</li>
                     <li style="font-size:24px">Say “the model relies on X”, not “X causes Y”</li>
                 </ul>
             </div>
             <div class="stack" style="gap:14px">
-                <h3>Limits and next steps</h3>
+                <h3>Limitations and future work</h3>
                 <ul class="list" style="gap:10px">
-                    <li style="font-size:23px">One dataset, three instances, two models, no confidence intervals: illustrative only</li>
-                    <li style="font-size:23px">No ground truth for the explanations, so we cannot say which method is “correct”</li>
-                    <li style="font-size:23px">LIME discretises features: only ranks and signs are comparable, not magnitudes</li>
-                    <li style="font-size:23px">Probability scale and KernelSHAP only; runtimes from one machine</li>
-                    <li style="font-size:23px">Next: insertion test, LIME \(R^2\), TreeSHAP, log-odds, more data and repetitions</li>
+                    <li style="font-size:23px">Only one dataset, three instances and two models, with no confidence intervals</li>
+                    <li style="font-size:23px">There is no ground truth for explanations, so we can’t say which method is “correct”</li>
+                    <li style="font-size:23px">LIME discretises features, so we can only compare ranks and signs, not sizes</li>
+                    <li style="font-size:23px">We only used the probability scale and KernelSHAP; runtimes are from one machine</li>
+                    <li style="font-size:23px">Future work: insertion test, LIME \(R^2\), TreeSHAP, log-odds, more data and more runs</li>
                 </ul>
             </div>
         </div>
@@ -740,7 +740,7 @@ button:focus-visible { outline: 3px solid var(--lime); outline-offset: 3px; }
                 </div>
                 <div class="stack" style="gap:10px">
                     <h3>Use of AI tools</h3>
-                    <p style="font-size:23px">Claude (Anthropic) helped explain concepts, write experiment code and draft the report and slides. We checked every claim against the papers and every number against our CSV files.</p>
+                    <p style="font-size:23px">We used Claude (Anthropic) to help explain concepts, write the experiment code and draft the report and slides. We checked the claims against the papers and the numbers against our CSV files.</p>
                 </div>
             </div>
         </div>
