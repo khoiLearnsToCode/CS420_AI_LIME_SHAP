@@ -104,15 +104,15 @@ b, strong { font-weight: 600; }
 }
 .folio { position: absolute; right: 120px; bottom: 50px; font: 500 22px var(--sans); color: var(--ink-3); font-variant-numeric: tabular-nums; }
 
-p.lead { font: 400 30px/1.45 var(--sans); max-width: 1300px; }
-p, li { font-size: 27px; line-height: 1.45; }
+p.lead { font: 400 28px/1.45 var(--sans); max-width: 1300px; }
+p, li { font-size: 28px; line-height: 1.45; }
 .small { font-size: 23px; line-height: 1.45; color: var(--ink-2); }
 .cols { display: grid; gap: 64px; align-items: start; }
 .cols.c2 { grid-template-columns: 1fr 1fr; }
 .cols.c-wide-left  { grid-template-columns: 1.15fr 0.85fr; }
 .cols.c-wide-right { grid-template-columns: 0.82fr 1.18fr; }
 .stack { display: flex; flex-direction: column; gap: 26px; }
-h3 { font: 600 27px/1.25 var(--sans); color: var(--ink); }
+h3 { font: 600 30px/1.25 var(--sans); color: var(--ink); }
 h3 .sub { font-weight: 400; color: var(--ink-2); }
 
 /* Equation / definition box */
@@ -121,19 +121,19 @@ h3 .sub { font-weight: 400; color: var(--ink-2); }
 .eq .katex-display { margin: 6px 0; }
 
 /* Symbol list: two-column definition grid */
-.defs { display: grid; grid-template-columns: 150px 1fr; column-gap: 24px; row-gap: 12px; font-size: 24px; line-height: 1.4; }
+.defs { display: grid; grid-template-columns: 150px 1fr; column-gap: 24px; row-gap: 12px; font-size: 28px; line-height: 1.4; }
 .defs dt { color: var(--ink); text-align: right; }
 .defs dd { color: var(--ink-2); }
 
 /* Sequenced steps (only where content really is a sequence) */
 .steps { list-style: none; display: flex; flex-direction: column; gap: 30px; counter-reset: s; }
-.steps li { counter-increment: s; display: grid; grid-template-columns: 56px 1fr; column-gap: 20px; font-size: 24px; line-height: 1.4; }
+.steps li { counter-increment: s; display: grid; grid-template-columns: 56px 1fr; column-gap: 20px; font-size: 28px; line-height: 1.4; }
 .steps li::before {
     content: counter(s); width: 48px; height: 48px; border-radius: 50%;
     border: 2px solid var(--ink); color: var(--ink);
     font: 600 24px/44px var(--sans); text-align: center;
 }
-.steps li b { display: block; font-size: 27px; margin-bottom: 2px; }
+.steps li b { display: block; font-size: 28px; margin-bottom: 2px; }
 
 /* Plain bullet list */
 .list { list-style: none; display: flex; flex-direction: column; gap: 18px; }
@@ -175,10 +175,15 @@ h3 .sub { font-weight: 400; color: var(--ink-2); }
 
 /* Bigger bullet lists and one-idea takeaway blocks */
 .list.big { gap: 22px; }
-.list.big li { font-size: 30px; }
+.list.big li { font-size: 28px; }
 .takeaway { display: flex; flex-direction: column; gap: 10px; max-width: 1360px; }
 .takeaway h3 { font-size: 30px; }
 .takeaway p { font-size: 28px; line-height: 1.45; }
+
+/* Question / answer rows (conclusion slide) */
+.qa { display: flex; flex-direction: column; gap: 44px; }
+.qa-row { display: flex; flex-direction: column; gap: 10px; }
+.qa-row p { padding-left: 56px; }
 
 /* ===========================================================
    TITLE SLIDE
@@ -208,6 +213,15 @@ h3 .sub { font-weight: 400; color: var(--ink-2); }
 .refs { list-style: none; display: flex; flex-direction: column; gap: 18px; }
 .refs li { font-size: 23px; line-height: 1.42; color: var(--ink); padding-left: 0; }
 .refs li em { font-style: italic; }
+
+
+/* Links (references slide) */
+.slide a { color: var(--shap-ink); text-decoration: underline; text-underline-offset: 3px; }
+.slide a:hover { color: var(--ink); }
+
+/* End slides: Questions / Thank you */
+.end-slide { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; padding: 0 160px; }
+.end-slide h2 { font: 500 112px/1.1 var(--serif); font-variation-settings: 'opsz' 72; letter-spacing: -0.02em; color: var(--ink); text-align: center; text-wrap: balance; }
 
 /* ===========================================================
    INLINE EDITING (press E, or hover the top-left corner)
@@ -252,7 +266,7 @@ button:focus-visible { outline: 3px solid var(--lime); outline-offset: 3px; }
         </div>
     </div>
     <aside class="title-panel" aria-label="LIME and SHAP top-5 features for the misclassified tumour">
-        <h3>One wrong prediction, explained twice</h3>
+        <h3>LIME and SHAP on the same wrong prediction</h3>
         <svg class="chart tie" viewBox="0 0 560 440" width="560" height="440" role="img"
              aria-label="Top-5 features: LIME and SHAP share only mean area and mean radius">
             <text class="hdr" x="258" y="28" text-anchor="end" fill="#A35700">LIME top 5</text>
@@ -290,7 +304,7 @@ button:focus-visible { outline: 3px solid var(--lime); outline-offset: 3px; }
             <li><b>Stable:</b> gives the same result when we change the seed or background data</li>
             <li><b>Faithful:</b> removing its top features changes the prediction a lot</li>
         </ul>
-        <p class="lead" style="color:var(--ink-2)">Model accuracy alone tells us nothing about these.</p>
+        <p class="lead" style="color:var(--ink-2)">High accuracy doesn’t mean the explanation is good.</p>
     </div>
     <div class="folio"></div>
 </section>
@@ -302,7 +316,7 @@ button:focus-visible { outline: 3px solid var(--lime); outline-offset: 3px; }
     <aside class="rail"><ul class="outline"></ul>
         <p class="source"><b>Sources</b>Data: Street et al. (1993). Accuracy: our experiment.</p></aside>
     <div class="body">
-        <h2 class="headline">Setup: one dataset, two models</h2>
+        <h2 class="headline">Our data, models and settings</h2>
         <div class="cols c2">
             <div class="stack" style="gap:18px">
                 <h3>Data and models</h3>
@@ -390,7 +404,7 @@ button:focus-visible { outline: 3px solid var(--lime); outline-offset: 3px; }
                 <tr><td><b>Mersha et al. (2024)</b></td><td>Survey of XAI</td><td>4 axes and 5 criteria: fidelity, consistency, robustness, efficiency, sufficiency</td><td>Covers LIME and SHAP only briefly</td></tr>
             </tbody>
         </table>
-        <p class="small">We use Mersha et al.’s criteria loosely, not their exact formulas.</p>
+        <p class="small">We use Mersha et al.’s criteria as a guide, not using their formulas.</p>
     </div>
     <div class="folio"></div>
 </section>
@@ -402,7 +416,7 @@ button:focus-visible { outline: 3px solid var(--lime); outline-offset: 3px; }
     <aside class="rail"><ul class="outline"></ul>
         <p class="source"><b>Source</b>Ribeiro, Singh &amp; Guestrin (2016), KDD.</p></aside>
     <div class="body">
-        <h2 class="headline">LIME copies the model around one input with a simple linear model</h2>
+        <h2 class="headline">LIME fits a simple linear model around one input</h2>
         <div class="box eq">
             \[\xi(x)=\arg\min_{g\in G}\; L(f,g,\pi_x)+\Omega(g)\]
             \[L=\sum_{z,z'}\pi_x(z)\,\big(f(z)-g(z')\big)^2,\quad \pi_x(z)=\exp\!\big(-D(x,z)^2/\sigma^2\big)\]
@@ -423,7 +437,7 @@ button:focus-visible { outline: 3px solid var(--lime); outline-offset: 3px; }
     <aside class="rail"><ul class="outline"></ul>
         <p class="source"><b>Source</b>Ribeiro, Singh &amp; Guestrin (2016), KDD.</p></aside>
     <div class="body">
-        <h2 class="headline">LIME copies the model around one input with a simple linear model</h2>
+        <h2 class="headline">LIME fits a simple linear model around one input</h2>
         <div class="box eq">
             \[\xi(x)=\arg\min_{g\in G}\; L(f,g,\pi_x)+\Omega(g)\]
             \[L=\sum_{z,z'}\pi_x(z)\,\big(f(z)-g(z')\big)^2,\quad \pi_x(z)=\exp\!\big(-D(x,z)^2/\sigma^2\big)\]
@@ -433,7 +447,7 @@ button:focus-visible { outline: 3px solid var(--lime); outline-offset: 3px; }
             <dl class="defs">
                 <dt>\(f,\ x\)</dt><dd>black box, \(f(x)\) = P(malignant); instance \(x\in\mathbb{R}^{30}\)</dd>
                 <dt>\(z,\ z'\)</dt><dd>perturbed sample; its on/off form \(z'\in\{0,1\}^N\)</dd>
-                <dt>\(\pi_x,\ \sigma\)</dt><dd>weight in \((0,1]\); width \(\sigma\): too small is noisy, too large is not local</dd>
+                <dt>\(\pi_x,\ \sigma\)</dt><dd>weight in \((0,1]\); width \(\sigma\): if it is too small the result is noisy; if it is too large it is no longer local</dd>
                 <dt>\(G,\ \Omega\)</dt><dd>linear models; \(\Omega\) keeps at most \(K\) features</dd>
                 <dt>\(L\)</dt><dd>weighted squared error</dd>
             </dl>
@@ -446,7 +460,7 @@ button:focus-visible { outline: 3px solid var(--lime); outline-offset: 3px; }
     <aside class="rail"><ul class="outline"></ul>
         <p class="source"><b>Sources</b>Ribeiro et al. (2016); Lundberg &amp; Lee (2017); the <code>lime</code> library.</p></aside>
     <div class="body">
-        <h2 class="headline">LIME copies the model around one input with a simple linear model</h2>
+        <h2 class="headline">LIME fits a simple linear model around one input</h2>
         <div class="box eq">
             \[\xi(x)=\arg\min_{g\in G}\; L(f,g,\pi_x)+\Omega(g)\]
             \[L=\sum_{z,z'}\pi_x(z)\,\big(f(z)-g(z')\big)^2,\quad \pi_x(z)=\exp\!\big(-D(x,z)^2/\sigma^2\big)\]
@@ -499,7 +513,7 @@ button:focus-visible { outline: 3px solid var(--lime); outline-offset: 3px; }
             <ul class="list big">
                 <li><b>Local accuracy:</b> \(g(x')=f(x)\)</li>
                 <li><b>Missingness:</b> a missing feature gets 0</li>
-                <li><b>Consistency:</b> if a feature matters more, its credit never drops</li>
+                <li><b>Consistency:</b> if the model depends more on a feature, its SHAP value does not go down</li>
             </ul>
         </div>
     </div>
@@ -517,9 +531,8 @@ button:focus-visible { outline: 3px solid var(--lime); outline-offset: 3px; }
         <div class="stack" style="gap:24px">
             <h3>How to read SHAP values</h3>
             <ul class="list big">
-                <li><b>Baseline:</b> \(\varphi_0\) = average prediction on the background data</li>
-                <li><b>Sum:</b> \(\varphi_0+\sum_j\varphi_j=f(x)\), always</li>
-                <li><b>Sign:</b> positive pushes the prediction above the baseline</li>
+                <li><b>Baseline:</b> \(\varphi_0\) = average prediction on the background data; a positive \(\varphi_j\) pushes the prediction above it</li>
+                <li><b>Sum:</b> \(\varphi_0+\sum_j\varphi_j\) always equals \(f(x)\)</li>
             </ul>
         </div>
     </div>
@@ -556,7 +569,7 @@ button:focus-visible { outline: 3px solid var(--lime); outline-offset: 3px; }
         <h2 class="headline">Worked example 1: SHAP values add up to the prediction</h2>
         <div class="cols" style="grid-template-columns:1.2fr 0.8fr;gap:56px">
             <div class="stack" style="gap:28px">
-                <div class="box" style="font-size:26px;line-height:1.55;padding:24px 32px">
+                <div class="box" style="font-size:28px;line-height:1.55;padding:24px 32px">
                     \(f(x)=1+2x_1-x_2+0.5x_3\), \(\ \mu=(1,2,4)\), \(\ x=(3,1,6)\)<br>
                     Closed form: \(\varphi_j=w_j\,(x_j-\mu_j)\)
                 </div>
@@ -613,7 +626,7 @@ button:focus-visible { outline: 3px solid var(--lime); outline-offset: 3px; }
         <h2 class="headline">Worked example 1: SHAP values add up to the prediction</h2>
         <div class="cols" style="grid-template-columns:1.2fr 0.8fr;gap:56px">
             <div class="stack" style="gap:28px">
-                <div class="box" style="font-size:26px;line-height:1.55;padding:24px 32px">
+                <div class="box" style="font-size:28px;line-height:1.55;padding:24px 32px">
                     \(f(x)=1+2x_1-x_2+0.5x_3\), \(\ \mu=(1,2,4)\), \(\ x=(3,1,6)\)<br>
                     Closed form: \(\varphi_j=w_j\,(x_j-\mu_j)\)
                 </div>
@@ -671,7 +684,7 @@ button:focus-visible { outline: 3px solid var(--lime); outline-offset: 3px; }
         <h2 class="headline">Worked example 2: LIME gets close to the true local slopes</h2>
         <div class="cols" style="grid-template-columns:0.95fr 1.05fr;gap:60px">
             <div class="stack" style="gap:28px">
-                <div class="box" style="font-size:26px;line-height:1.6">
+                <div class="box" style="font-size:28px;line-height:1.6">
                     \(f(x)=\mathrm{sigmoid}(x_1^2-x_2)\), explain \(x_0=(1,2)\), \(f(x_0)=0.2689\)<br>
                     <span class="small">Simplified: 6 fixed points, \(\sigma=1\), no \(\Omega\), shifted raw features as \(z'\)</span>
                 </div>
@@ -704,7 +717,7 @@ button:focus-visible { outline: 3px solid var(--lime); outline-offset: 3px; }
         <h2 class="headline">Worked example 2: LIME gets close to the true local slopes</h2>
         <div class="cols" style="grid-template-columns:0.95fr 1.05fr;gap:60px">
             <div class="stack" style="gap:28px">
-                <div class="box" style="font-size:26px;line-height:1.6">
+                <div class="box" style="font-size:28px;line-height:1.6">
                     \(f(x)=\mathrm{sigmoid}(x_1^2-x_2)\), explain \(x_0=(1,2)\), \(f(x_0)=0.2689\)<br>
                     <span class="small">Simplified: 6 fixed points, \(\sigma=1\), no \(\Omega\), shifted raw features as \(z'\)</span>
                 </div>
@@ -739,7 +752,7 @@ button:focus-visible { outline: 3px solid var(--lime); outline-offset: 3px; }
         <h2 class="headline">Worked example 2: LIME gets close to the true local slopes</h2>
         <div class="cols" style="grid-template-columns:0.95fr 1.05fr;gap:60px">
             <div class="stack" style="gap:28px">
-                <div class="box" style="font-size:26px;line-height:1.6">
+                <div class="box" style="font-size:28px;line-height:1.6">
                     \(f(x)=\mathrm{sigmoid}(x_1^2-x_2)\), explain \(x_0=(1,2)\), \(f(x_0)=0.2689\)<br>
                     <span class="small">Simplified: 6 fixed points, \(\sigma=1\), no \(\Omega\), shifted raw features as \(z'\)</span>
                 </div>
@@ -751,8 +764,7 @@ button:focus-visible { outline: 3px solid var(--lime); outline-offset: 3px; }
                     </tbody>
                 </table>
                 <ul class="list" style="gap:12px">
-                    <li>\(g_1\) is almost exact</li>
-                    <li>\(g_2\) has the right sign but is off by about 0.05</li>
+                    <li>\(g_1\) is almost exact; \(g_2\) has the right sign but is off by about 0.05</li>
                     <li>6 points can’t capture the curve of \(f\), so the result depends on the sample</li>
                 </ul>
             </div>
@@ -812,7 +824,7 @@ button:focus-visible { outline: 3px solid var(--lime); outline-offset: 3px; }
                 <tr><td>RF</td><td>Misclassified</td><td class="c hi">0.4 / 0.44</td><td class="c">0.46</td><td>worst concave points</td><td>worst area</td><td class="r">0.069 / 0.390</td></tr>
             </tbody>
         </table>
-        <div class="takeaway"><h3>Different features, same signs</h3><p>Overlap@5 drops from 0.8–1.0 on easy cases to 0.4 on the misclassified one. But when both pick the same feature, the sign always matches.</p></div>
+        <div class="takeaway"><h3>They pick different features but agree on the sign</h3><p>Overlap@5 drops from 0.8–1.0 on easy cases to 0.4 on the misclassified one. But when both pick the same feature, the sign always matches.</p></div>
     </div>
     <div class="folio"></div>
 </section>
@@ -854,7 +866,7 @@ button:focus-visible { outline: 3px solid var(--lime); outline-offset: 3px; }
                 <tr><td>RF</td><td>Misclassified</td><td class="c hi">0.4 / 0.44</td><td class="c">0.46</td><td>worst concave points</td><td>worst area</td><td class="r">0.069 / 0.390</td></tr>
             </tbody>
         </table>
-        <div class="takeaway"><h3>KernelSHAP is slower</h3><p>On RF it takes 6–7× longer than LIME (2000 coalitions × 100 background rows). Timed on one machine, about ±20%.</p></div>
+        <div class="takeaway"><h3>KernelSHAP is slower</h3><p>On RF it takes 6–7× longer than LIME (2000 coalitions × 100 background rows). We timed this on one machine, so the times can vary by about ±20%.</p></div>
     </div>
     <div class="folio"></div>
 </section>
@@ -875,7 +887,7 @@ button:focus-visible { outline: 3px solid var(--lime); outline-offset: 3px; }
             <div class="stack" style="gap:4px"><span class="key"><i class="s"></i>SHAP</span>
                 <svg class="chart" data-chart="contribShap" width="682" height="428" viewBox="0 0 682 428" role="img" aria-label="SHAP contributions for the misclassified instance"></svg></div>
         </div>
-        <div class="takeaway"><h3>How to read the charts</h3><ul class="list big"><li>Top 5 in solid colour, shared features in <b>bold</b></li><li>The axes have different scales: compare ranks and signs, not bar lengths</li></ul></div>
+        <div class="takeaway"><h3>How to read the charts</h3><ul class="list big"><li>The top 5 features are solid; features both methods picked are in <b>bold</b></li><li>The two charts use different scales, so only compare the order and direction of the bars</li></ul></div>
     </div>
     <div class="folio"></div>
 </section>
@@ -892,7 +904,7 @@ button:focus-visible { outline: 3px solid var(--lime); outline-offset: 3px; }
             <div class="stack" style="gap:4px"><span class="key"><i class="s"></i>SHAP</span>
                 <svg class="chart" data-chart="contribShap" width="682" height="428" viewBox="0 0 682 428" role="img" aria-label="SHAP contributions for the misclassified instance"></svg></div>
         </div>
-        <div class="cols c2" style="gap:56px"><div class="takeaway"><h3>LIME: the evidence is split</h3><p>Its top feature, worst concave points, points towards benign. The size features point towards malignant.</p></div><div class="takeaway"><h3>SHAP: it’s all about size</h3><p>Almost all its top features are size features, and every one points towards malignant.</p></div></div>
+        <div class="cols c2" style="gap:56px"><div class="takeaway"><h3>LIME: features point both ways</h3><p>Its top feature, worst concave points, points towards benign. The size features point towards malignant.</p></div><div class="takeaway"><h3>SHAP: mostly size features</h3><p>Almost all its top features are size features, and every one points towards malignant.</p></div></div>
     </div>
     <div class="folio"></div>
 </section>
@@ -939,7 +951,7 @@ button:focus-visible { outline: 3px solid var(--lime); outline-offset: 3px; }
     <aside class="rail"><ul class="outline"></ul>
         <p class="source"><b>Source</b>Our experiment, results/stability.csv, sensitivity.csv; LIME 20 seeds, SHAP 5 background sets.</p></aside>
     <div class="body" style="gap:36px">
-        <h2 class="headline">Explanations change between runs, and tuning doesn’t fix it</h2>
+        <h2 class="headline">Running the same explanation again can give a different top 5</h2>
         <div><table class="tbl big">
                     <thead><tr><th>Model</th><th>Instance</th><th class="r">LIME<br><span style="font-weight:400">Jaccard / top-1</span></th><th class="r">SHAP<br><span style="font-weight:400">Jaccard / top-1</span></th></tr></thead>
                     <tbody>
@@ -960,7 +972,7 @@ button:focus-visible { outline: 3px solid var(--lime); outline-offset: 3px; }
     <aside class="rail"><ul class="outline"></ul>
         <p class="source"><b>Source</b>Our experiment, results/stability.csv, sensitivity.csv; LIME 20 seeds, SHAP 5 background sets.</p></aside>
     <div class="body" style="gap:36px">
-        <h2 class="headline">Explanations change between runs, and tuning doesn’t fix it</h2>
+        <h2 class="headline">Running the same explanation again can give a different top 5</h2>
         <div><table class="tbl big">
                     <thead><tr><th>Model</th><th>Instance</th><th class="r">LIME<br><span style="font-weight:400">Jaccard / top-1</span></th><th class="r">SHAP<br><span style="font-weight:400">Jaccard / top-1</span></th></tr></thead>
                     <tbody>
@@ -981,7 +993,7 @@ button:focus-visible { outline: 3px solid var(--lime); outline-offset: 3px; }
     <aside class="rail"><ul class="outline"></ul>
         <p class="source"><b>Source</b>Our experiment, results/stability.csv, sensitivity.csv; LIME 20 seeds, SHAP 5 background sets.</p></aside>
     <div class="body" style="gap:36px">
-        <h2 class="headline">Explanations change between runs, and tuning doesn’t fix it</h2>
+        <h2 class="headline">Running the same explanation again can give a different top 5</h2>
         <div><table class="tbl big">
                     <thead><tr><th>Model</th><th>Instance</th><th class="r">LIME<br><span style="font-weight:400">Jaccard / top-1</span></th><th class="r">SHAP<br><span style="font-weight:400">Jaccard / top-1</span></th></tr></thead>
                     <tbody>
@@ -1002,7 +1014,7 @@ button:focus-visible { outline: 3px solid var(--lime); outline-offset: 3px; }
     <aside class="rail"><ul class="outline"></ul>
         <p class="source"><b>Source</b>Our experiment, results/stability.csv, sensitivity.csv; LIME 20 seeds, SHAP 5 background sets.</p></aside>
     <div class="body" style="gap:36px">
-        <h2 class="headline">Explanations change between runs, and tuning doesn’t fix it</h2>
+        <h2 class="headline">Running the same explanation again can give a different top 5</h2>
         <div><table class="tbl big">
                     <thead><tr><th>Model</th><th>Instance</th><th class="r">LIME<br><span style="font-weight:400">Jaccard / top-1</span></th><th class="r">SHAP<br><span style="font-weight:400">Jaccard / top-1</span></th></tr></thead>
                     <tbody>
@@ -1053,7 +1065,7 @@ button:focus-visible { outline: 3px solid var(--lime); outline-offset: 3px; }
             <svg class="chart" data-chart="delRF" width="690" height="440" viewBox="0 0 690 440" role="img" aria-label="Deletion curves, Random Forest"></svg>
             <svg class="chart" data-chart="delLR" width="690" height="440" viewBox="0 0 690 440" role="img" aria-label="Deletion curves, Logistic Regression"></svg>
         </div>
-        <div class="takeaway"><h3>How the test works</h3><ul class="list big"><li>Remove the top-ranked features one by one (set to the training mean)</li><li>A faithful ranking makes P(predicted class) drop fast</li><li>Baseline: random order, 10 permutations</li></ul></div>
+        <div class="takeaway"><h3>How the test works</h3><ul class="list big"><li>Remove the top-ranked features one by one (set to the training mean)</li><li>A faithful ranking makes P(predicted class) drop faster than removing features in random order (10 times)</li></ul></div>
     </div>
     <div class="folio"></div>
 </section>
@@ -1068,7 +1080,7 @@ button:focus-visible { outline: 3px solid var(--lime); outline-offset: 3px; }
             <svg class="chart" data-chart="delRF" width="690" height="440" viewBox="0 0 690 440" role="img" aria-label="Deletion curves, Random Forest"></svg>
             <svg class="chart" data-chart="delLR" width="690" height="440" viewBox="0 0 690 440" role="img" aria-label="Deletion curves, Logistic Regression"></svg>
         </div>
-        <div class="takeaway"><h3>The gap between LIME and SHAP is tiny</h3><p>At most 0.02 after 5 removals, 0.04 after 10. With one seed, 20 instances and no confidence intervals, we can’t pick a winner.</p></div>
+        <div class="takeaway"><h3>The gap between LIME and SHAP is tiny</h3><p>The difference is at most 0.02 after 5 removals and 0.04 after 10. With one seed, 20 instances and no confidence intervals, we can’t pick a winner.</p></div>
     </div>
     <div class="folio"></div>
 </section>
@@ -1083,7 +1095,7 @@ button:focus-visible { outline: 3px solid var(--lime); outline-offset: 3px; }
             <svg class="chart" data-chart="delRF" width="690" height="440" viewBox="0 0 690 440" role="img" aria-label="Deletion curves, Random Forest"></svg>
             <svg class="chart" data-chart="delLR" width="690" height="440" viewBox="0 0 690 440" role="img" aria-label="Deletion curves, Logistic Regression"></svg>
         </div>
-        <div class="takeaway"><h3>Caveat</h3><p>Replacing with the mean can create unrealistic inputs, and correlated features can still carry each other’s information.</p></div>
+        <div class="takeaway"><h3>One problem with this test</h3><p>Replacing with the mean can create unrealistic inputs, and correlated features can still carry each other’s information.</p></div>
     </div>
     <div class="folio"></div>
 </section>
@@ -1096,12 +1108,12 @@ button:focus-visible { outline: 3px solid var(--lime); outline-offset: 3px; }
     <aside class="rail"><ul class="outline"></ul>
         <p class="source"><b>Source</b>Our analysis.</p></aside>
     <div class="body">
-        <h2 class="headline">Feature importance shows what the model uses, not what causes cancer</h2>
+        <h2 class="headline">Feature importance tells us what the model looks at. It doesn’t tell us what causes cancer.</h2>
         <div class="cols c2" style="gap:56px 72px">
-            <div class="takeaway"><h3>Correlated features</h3><p>Radius, perimeter and area grow together, so how credit is split depends on the model and background.</p></div>
-            <div class="takeaway"><h3>Unrealistic samples</h3><p>Features are changed one at a time, creating tumours that don’t exist, like a large area with a small radius.</p></div>
-            <div class="takeaway"><h3>Model mistakes</h3><p>On the misclassified tumour, the features explain the model’s error, not malignancy.</p></div>
-            <div class="takeaway"><h3>No real intervention</h3><p>Changing a value only changes the model’s input. Nothing happens to a real tumour.</p></div>
+            <div class="takeaway"><h3>Correlated features</h3><p>Radius, perimeter and area grow together, so which one gets the higher score depends on the model and the background data.</p></div>
+            <div class="takeaway"><h3>Unrealistic samples</h3><p>Each feature is changed on its own. This can create tumours that don’t exist, for example a large area with a small radius.</p></div>
+            <div class="takeaway"><h3>Model mistakes</h3><p>On the misclassified tumour, the features explain why the model was wrong. They don’t explain malignancy.</p></div>
+            <div class="takeaway"><h3>No real intervention</h3><p>We only change numbers in the model’s input, not anything about a real tumour.</p></div>
         </div>
     </div>
     <div class="folio"></div>
@@ -1125,7 +1137,7 @@ button:focus-visible { outline: 3px solid var(--lime); outline-offset: 3px; }
                 <tr><td>5. Small input changes, similar models</td><td>Robustness</td><td><span class="status"><i></i>Not done</span></td></tr>
             </tbody>
         </table>
-        <p class="lead">One check alone isn’t enough. An explanation should pass several.</p>
+        <p class="lead">We should only trust an explanation if it passes more than one of these checks.</p>
     </div>
     <div class="folio"></div>
 </section>
@@ -1137,11 +1149,11 @@ button:focus-visible { outline: 3px solid var(--lime); outline-offset: 3px; }
     <aside class="rail"><ul class="outline"></ul>
         <p class="source"><b>Source</b>Our experiment and report.</p></aside>
     <div class="body">
-        <h2 class="headline">So, no: a model can be 98% accurate and still have unreliable explanations</h2>
-        <div class="cols" style="grid-template-columns:repeat(3,1fr);gap:56px">
-            <div class="takeaway"><h3>Agreement</h3><p>On the misclassified tumour, only <b class="num">2 of 5</b> top features match.</p></div>
-            <div class="takeaway"><h3>Stability</h3><p>The top 5 changes between runs. Mean Jaccard goes as low as <b class="num">0.53</b>.</p></div>
-            <div class="takeaway"><h3>Faithfulness</h3><p>Both beat random, but neither is clearly better. Neither shows causes.</p></div>
+        <h2 class="headline">Back to our three questions</h2>
+        <div class="qa">
+            <div class="qa-row"><h3>Do they agree?</h3><p><b>Not on hard cases.</b> Only 2 of 5 top features match on the misclassified tumour.</p></div>
+            <div class="qa-row"><h3>Do they give the same answer every run?</h3><p><b>Not always.</b> Mean Jaccard goes as low as 0.53.</p></div>
+            <div class="qa-row"><h3>Do the features they pick actually matter?</h3><p><b>Yes, more than random.</b> Both beat random deletion, but we can’t say which is better.</p></div>
         </div>
     </div>
     <div class="folio"></div>
@@ -1177,10 +1189,10 @@ button:focus-visible { outline: 3px solid var(--lime); outline-offset: 3px; }
             <div class="stack" style="gap:18px">
                 <h3>Limitations</h3>
                 <ul class="list big">
-                    <li>One dataset, three instances, two models</li>
+                    <li>We only used one dataset, two models and three test cases</li>
                     <li>No confidence intervals</li>
-                    <li>No ground truth, so no “correct” method</li>
-                    <li>LIME discretises: compare ranks and signs only</li>
+                    <li>There is no ground truth, so we can’t say which method is correct</li>
+                    <li>Because LIME discretises features, we only compare ranks and signs</li>
                     <li>Probability scale and KernelSHAP only</li>
                 </ul>
             </div>
@@ -1203,21 +1215,21 @@ button:focus-visible { outline: 3px solid var(--lime); outline-offset: 3px; }
      ========================================================= -->
 <section class="slide" data-section="References">
     <div class="body" style="left:140px;width:1640px;top:110px;gap:48px">
-        <h2 class="headline" style="font-size:76px">Questions</h2>
+        <h2 class="headline">References</h2>
         <div class="cols" style="grid-template-columns:1.25fr 0.75fr;gap:80px">
             <div class="stack" style="gap:18px">
-                <h3>References</h3>
+                <h3>Papers</h3>
                 <ol class="refs">
-                    <li>Ribeiro, M. T., Singh, S. &amp; Guestrin, C. (2016). “Why Should I Trust You?”: Explaining the Predictions of Any Classifier. <em>KDD 2016</em>, 1135–1144.</li>
-                    <li>Lundberg, S. M. &amp; Lee, S.-I. (2017). A Unified Approach to Interpreting Model Predictions. <em>NeurIPS 2017</em>.</li>
-                    <li>Mersha, M., Lam, K., Wood, J., AlShami, A. &amp; Kalita, J. (2024). Explainable artificial intelligence: A survey of needs, techniques, applications, and future direction. <em>Neurocomputing</em> 599, 128111.</li>
-                    <li>Street, W. N., Wolberg, W. H. &amp; Mangasarian, O. L. (1993). Nuclear feature extraction for breast tumor diagnosis. <em>Proc. SPIE</em> 1905, 861–870.</li>
+                    <li>Ribeiro, M. T., Singh, S. &amp; Guestrin, C. (2016). “Why Should I Trust You?”: Explaining the Predictions of Any Classifier. <em>KDD 2016</em>, 1135–1144. <a href="https://doi.org/10.1145/2939672.2939778" target="_blank" rel="noopener">doi.org/10.1145/2939672.2939778</a></li>
+                    <li>Lundberg, S. M. &amp; Lee, S.-I. (2017). A Unified Approach to Interpreting Model Predictions. <em>NeurIPS 2017</em>. <a href="https://proceedings.neurips.cc/paper_files/paper/2017/hash/8a20a8621978632d76c43dfd28b67767-Abstract.html" target="_blank" rel="noopener">NeurIPS paper page</a></li>
+                    <li>Mersha, M., Lam, K., Wood, J., AlShami, A. &amp; Kalita, J. (2024). Explainable artificial intelligence: A survey of needs, techniques, applications, and future direction. <em>Neurocomputing</em> 599, 128111. <a href="https://doi.org/10.1016/j.neucom.2024.128111" target="_blank" rel="noopener">doi.org/10.1016/j.neucom.2024.128111</a></li>
+                    <li>Street, W. N., Wolberg, W. H. &amp; Mangasarian, O. L. (1993). Nuclear feature extraction for breast tumor diagnosis. <em>Proc. SPIE</em> 1905, 861–870. <a href="https://api.semanticscholar.org/CorpusID:14922543" target="_blank" rel="noopener">Semantic Scholar page</a></li>
                 </ol>
             </div>
             <div class="stack" style="gap:28px">
                 <div class="stack" style="gap:10px">
                     <h3>Code and data</h3>
-                    <p style="font-size:23px">Notebook, CSV results and figures:<br><span style="word-break:break-all">github.com/khoiLearnsToCode/CS420_AI_LIME_SHAP</span></p>
+                    <p style="font-size:23px">Notebook, CSV results and figures:<br><a href="https://github.com/khoiLearnsToCode/CS420_AI_LIME_SHAP" target="_blank" rel="noopener" style="word-break:break-all">github.com/khoiLearnsToCode/CS420_AI_LIME_SHAP</a></p>
                     <p style="font-size:23px">Python, scikit-learn, <code>lime</code>, <code>shap</code>.</p>
                 </div>
                 <div class="stack" style="gap:10px">
@@ -1227,6 +1239,22 @@ button:focus-visible { outline: 3px solid var(--lime); outline-offset: 3px; }
             </div>
         </div>
     </div>
+    <div class="folio"></div>
+</section>
+
+<!-- =========================================================
+     QUESTIONS
+     ========================================================= -->
+<section class="slide" data-section="End" aria-label="Questions">
+    <div class="end-slide"><h2>Questions</h2></div>
+    <div class="folio"></div>
+</section>
+
+<!-- =========================================================
+     THANK YOU
+     ========================================================= -->
+<section class="slide" data-section="End" aria-label="Thank you">
+    <div class="end-slide"><h2>Thank you for your attention</h2></div>
     <div class="folio"></div>
 </section>
 
