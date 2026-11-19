@@ -517,9 +517,8 @@ button:focus-visible { outline: 3px solid var(--lime); outline-offset: 3px; }
         <div class="stack" style="gap:24px">
             <h3>How to read SHAP values</h3>
             <ul class="list big">
-                <li><b>Baseline:</b> \(\varphi_0\) = average prediction on the background data</li>
+                <li><b>Baseline:</b> \(\varphi_0\) = average prediction on the background data; a positive \(\varphi_j\) pushes the prediction above it</li>
                 <li><b>Sum:</b> \(\varphi_0+\sum_j\varphi_j\) always equals \(f(x)\)</li>
-                <li><b>Sign:</b> positive pushes the prediction above the baseline</li>
             </ul>
         </div>
     </div>
@@ -751,8 +750,7 @@ button:focus-visible { outline: 3px solid var(--lime); outline-offset: 3px; }
                     </tbody>
                 </table>
                 <ul class="list" style="gap:12px">
-                    <li>\(g_1\) is almost exact</li>
-                    <li>\(g_2\) has the right sign but is off by about 0.05</li>
+                    <li>\(g_1\) is almost exact; \(g_2\) has the right sign but is off by about 0.05</li>
                     <li>6 points can’t capture the curve of \(f\), so the result depends on the sample</li>
                 </ul>
             </div>
@@ -1053,7 +1051,7 @@ button:focus-visible { outline: 3px solid var(--lime); outline-offset: 3px; }
             <svg class="chart" data-chart="delRF" width="690" height="440" viewBox="0 0 690 440" role="img" aria-label="Deletion curves, Random Forest"></svg>
             <svg class="chart" data-chart="delLR" width="690" height="440" viewBox="0 0 690 440" role="img" aria-label="Deletion curves, Logistic Regression"></svg>
         </div>
-        <div class="takeaway"><h3>How the test works</h3><ul class="list big"><li>Remove the top-ranked features one by one (set to the training mean)</li><li>A faithful ranking makes P(predicted class) drop fast</li><li>We compare with removing features in random order (10 times)</li></ul></div>
+        <div class="takeaway"><h3>How the test works</h3><ul class="list big"><li>Remove the top-ranked features one by one (set to the training mean)</li><li>A faithful ranking makes P(predicted class) drop faster than removing features in random order (10 times)</li></ul></div>
     </div>
     <div class="folio"></div>
 </section>
@@ -1177,7 +1175,7 @@ button:focus-visible { outline: 3px solid var(--lime); outline-offset: 3px; }
             <div class="stack" style="gap:18px">
                 <h3>Limitations</h3>
                 <ul class="list big">
-                    <li>One dataset, three instances, two models</li>
+                    <li>We only used one dataset, two models and three test cases</li>
                     <li>No confidence intervals</li>
                     <li>There is no ground truth, so we can’t say which method is correct</li>
                     <li>Because LIME discretises features, we only compare ranks and signs</li>
