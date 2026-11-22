@@ -460,6 +460,23 @@ button:focus-visible { outline: 3px solid var(--lime); outline-offset: 3px; }
 
 <section class="slide" data-section="Background">
     <aside class="rail"><ul class="outline"></ul>
+        <p class="source"><b>Sources</b>Figure: Sadeghi et al. (2024), Fig. 4. Method: Ribeiro et al. (2016).</p></aside>
+    <div class="body">
+        <h2 class="headline">LIME fits a simple linear model around one input</h2>
+        <div class="box eq">
+            \[\xi(x)=\arg\min_{g\in G}\; L(f,g,\pi_x)+\Omega(g)\]
+            \[L=\sum_{z,z'}\pi_x(z)\,\big(f(z)-g(z')\big)^2,\quad \pi_x(z)=\exp\!\big(-D(x,z)^2/\sigma^2\big)\]
+        </div>
+        <figure class="pfig">
+            <img src="img/sadeghi_fig4_lime_car.png" alt="Sadeghi et al. Fig. 4: a car image is split into superpixels, parts are greyed out, each perturbed image gets P(car), a locally weighted regression is fitted, and the explanation keeps the important parts" style="height:470px">
+            <figcaption><b>Sadeghi et al. (2024), Fig. 4</b>The same steps on an image:<br>1. Split \(x\) into superpixels and grey some out to get \(z\)<br>2. Record \(f(z)\) = P(car) for each sample<br>3. Fit a weighted linear model \(g\); the parts it keeps are the explanation</figcaption>
+        </figure>
+    </div>
+    <div class="folio"></div>
+</section>
+
+<section class="slide" data-section="Background">
+    <aside class="rail"><ul class="outline"></ul>
         <p class="source"><b>Source</b>Ribeiro, Singh &amp; Guestrin (2016), KDD.</p></aside>
     <div class="body">
         <h2 class="headline">LIME fits a simple linear model around one input</h2>
@@ -477,6 +494,10 @@ button:focus-visible { outline: 3px solid var(--lime); outline-offset: 3px; }
                 <dt>\(L\)</dt><dd>weighted squared error</dd>
             </dl>
         </div>
+        <figure class="pfig" style="margin-top:-8px">
+            <img src="img/lime_fig4_guitar.png" alt="Ribeiro et al. Fig. 4: a dog playing guitar; LIME keeps the superpixels that support Electric guitar, Acoustic guitar and Labrador and greys out the rest" style="height:230px">
+            <figcaption style="align-self:flex-start;max-width:460px"><b>Ribeiro et al. (2016), Fig. 4</b>For images, \(z'\) switches superpixels on or off. Each explanation keeps only the superpixels that support one class.</figcaption>
+        </figure>
     </div>
     <div class="folio"></div>
 </section>
@@ -1272,6 +1293,7 @@ button:focus-visible { outline: 3px solid var(--lime); outline-offset: 3px; }
                     <li>Ribeiro, M. T., Singh, S. &amp; Guestrin, C. (2016). “Why Should I Trust You?”: Explaining the Predictions of Any Classifier. <em>KDD 2016</em>, 1135–1144. <a href="https://doi.org/10.1145/2939672.2939778" target="_blank" rel="noopener">doi.org/10.1145/2939672.2939778</a></li>
                     <li>Lundberg, S. M. &amp; Lee, S.-I. (2017). A Unified Approach to Interpreting Model Predictions. <em>NeurIPS 2017</em>. <a href="https://proceedings.neurips.cc/paper_files/paper/2017/hash/8a20a8621978632d76c43dfd28b67767-Abstract.html" target="_blank" rel="noopener">NeurIPS paper page</a></li>
                     <li>Mersha, M., Lam, K., Wood, J., AlShami, A. &amp; Kalita, J. (2024). Explainable artificial intelligence: A survey of needs, techniques, applications, and future direction. <em>Neurocomputing</em> 599, 128111. <a href="https://doi.org/10.1016/j.neucom.2024.128111" target="_blank" rel="noopener">doi.org/10.1016/j.neucom.2024.128111</a></li>
+                    <li>Sadeghi, Z., Alizadehsani, R., Cifci, M. A., et al. (2024). A review of Explainable Artificial Intelligence in healthcare. <em>Computers and Electrical Engineering</em> 118, 109370. <a href="https://doi.org/10.1016/j.compeleceng.2024.109370" target="_blank" rel="noopener">doi.org/10.1016/j.compeleceng.2024.109370</a></li>
                     <li>Street, W. N., Wolberg, W. H. &amp; Mangasarian, O. L. (1993). Nuclear feature extraction for breast tumor diagnosis. <em>Proc. SPIE</em> 1905, 861–870. <a href="https://api.semanticscholar.org/CorpusID:14922543" target="_blank" rel="noopener">Semantic Scholar page</a></li>
                 </ol>
             </div>
