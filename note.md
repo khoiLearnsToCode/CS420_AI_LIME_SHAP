@@ -1,0 +1,4 @@
+- thêm tên TA
+- ít chữ lại cho mỗi slide
+- "Random Forest says P(malignant) = 0.745; the tumour is benign. The two methods share 2 of their 5 most important features." slide 1 bỏ
+- Three test instances, chosen by a fixed rule - 

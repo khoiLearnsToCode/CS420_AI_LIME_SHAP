@@ -180,6 +180,13 @@ h3 .sub { font-weight: 400; color: var(--ink-2); }
 .takeaway h3 { font-size: 30px; }
 .takeaway p { font-size: 28px; line-height: 1.45; }
 
+/* Figures reproduced from the reference papers (slides/img/) */
+.pfig { margin: 0; display: flex; align-items: flex-end; gap: 36px; }
+.pfig.col { flex-direction: column; align-items: flex-start; gap: 14px; }
+.pfig img { display: block; flex: none; max-width: none; max-height: none; }
+.pfig figcaption { font-size: 21px; line-height: 1.42; color: var(--ink-2); max-width: 540px; }
+.pfig figcaption b { display: block; color: var(--ink); font-weight: 600; margin-bottom: 4px; }
+
 /* Question / answer rows (conclusion slide) */
 .qa { display: flex; flex-direction: column; gap: 44px; }
 .qa-row { display: flex; flex-direction: column; gap: 10px; }
@@ -296,15 +303,23 @@ button:focus-visible { outline: 3px solid var(--lime); outline-offset: 3px; }
      ========================================================= -->
 <section class="slide" data-section="Question">
     <aside class="rail"><ul class="outline"></ul>
-        <p class="source"><b>Source</b>Our experiment design.</p></aside>
+        <p class="source"><b>Sources</b>Our experiment design. Figure: Mersha et al. (2024), Fig. 13.</p></aside>
     <div class="body">
         <h2 class="headline">We test each explanation on three things</h2>
-        <ul class="list big">
-            <li><b>Useful:</b> shows which features raise or lower the prediction</li>
-            <li><b>Stable:</b> gives the same result when we change the seed or background data</li>
-            <li><b>Faithful:</b> removing its top features changes the prediction a lot</li>
-        </ul>
-        <p class="lead" style="color:var(--ink-2)">High accuracy doesn’t mean the explanation is good.</p>
+        <div class="cols" style="grid-template-columns:1fr 470px;gap:72px">
+            <div class="stack" style="gap:44px">
+                <ul class="list big" style="gap:30px">
+                    <li><b>Useful:</b> shows which features raise or lower the prediction</li>
+                    <li><b>Stable:</b> gives the same result when we change the seed or background data</li>
+                    <li><b>Faithful:</b> removing its top features changes the prediction a lot</li>
+                </ul>
+                <p class="lead" style="color:var(--ink-2)">High accuracy doesn’t mean the explanation is good.</p>
+            </div>
+            <figure class="pfig col">
+                <img src="img/mersha_fig13_criteria.png" alt="Mersha et al. Fig. 13, computer-centred evaluation criteria: fidelity, consistency, robustness, efficiency, sufficiency" style="height:720px">
+                <figcaption>Computer-centred criteria from Mersha et al. (2024). Stable ≈ consistency; faithful ≈ fidelity.</figcaption>
+            </figure>
+        </div>
     </div>
     <div class="folio"></div>
 </section>
@@ -384,6 +399,10 @@ button:focus-visible { outline: 3px solid var(--lime); outline-offset: 3px; }
                 <tr><td>Intrinsic vs. <b>post-hoc</b></td><td>Interpretable by design vs. explained after training</td><td>Post-hoc, by perturbing the input</td></tr>
             </tbody>
         </table>
+        <figure class="pfig" style="margin-top:-8px">
+            <img src="img/lime_fig1_flu.png" alt="Ribeiro et al. Fig. 1: a model predicts flu; LIME shows sneeze and headache support it, no fatigue goes against it; a doctor decides" style="height:200px">
+            <figcaption><b>Ribeiro et al. (2016), Fig. 1</b>One prediction (flu) is explained by the symptoms behind it, so a doctor can decide whether to trust it.</figcaption>
+        </figure>
     </div>
     <div class="folio"></div>
 </section>
@@ -421,13 +440,19 @@ button:focus-visible { outline: 3px solid var(--lime); outline-offset: 3px; }
             \[\xi(x)=\arg\min_{g\in G}\; L(f,g,\pi_x)+\Omega(g)\]
             \[L=\sum_{z,z'}\pi_x(z)\,\big(f(z)-g(z')\big)^2,\quad \pi_x(z)=\exp\!\big(-D(x,z)^2/\sigma^2\big)\]
         </div>
-        <div class="stack" style="gap:24px">
-            <h3>How it works</h3>
-            <ol class="steps" style="flex-direction:row;gap:48px">
-                <li style="flex:1"><span><b>Perturb</b>Generate 5000 points \(z\) around \(x\) and get \(f(z)\)</span></li>
-                <li style="flex:1"><span><b>Weight</b>Closer points get a higher weight \(\pi_x\)</span></li>
-                <li style="flex:1"><span><b>Fit</b>Fit a sparse linear model \(g\); its coefficients are the explanation</span></li>
-            </ol>
+        <div class="cols" style="grid-template-columns:1fr 620px;gap:64px">
+            <div class="stack" style="gap:24px">
+                <h3>How it works</h3>
+                <ol class="steps" style="gap:26px">
+                    <li><span><b>Perturb</b>Generate 5000 points \(z\) around \(x\) and get \(f(z)\)</span></li>
+                    <li><span><b>Weight</b>Closer points get a higher weight \(\pi_x\)</span></li>
+                    <li><span><b>Fit</b>Fit a sparse linear model \(g\); its coefficients are the explanation</span></li>
+                </ol>
+            </div>
+            <figure class="pfig col">
+                <img src="img/lime_fig3_toy.png" alt="Ribeiro et al. Fig. 3: complex blue/pink decision boundary, bold red cross is the instance, dashed line is LIME's local linear fit" style="width:620px">
+                <figcaption>Ribeiro et al. (2016), Fig. 3. Bold red cross = \(x\); marker size = weight \(\pi_x\); dashed line = \(g\), faithful only near \(x\).</figcaption>
+            </figure>
         </div>
     </div>
     <div class="folio"></div>
@@ -473,6 +498,10 @@ button:focus-visible { outline: 3px solid var(--lime); outline-offset: 3px; }
                 <li>The <code>lime</code> library discretises features, so a weight refers to a value range <span class="muted small">(our note)</span></li>
             </ul>
         </div>
+        <figure class="pfig">
+            <img src="img/shap_fig3_converge.png" alt="Lundberg and Lee Fig. 3: LIME's estimate stays away from the true Shapley value while KernelSHAP and Shapley sampling reach it" style="height:250px">
+            <figcaption><b>Lundberg &amp; Lee (2017), Fig. 3</b>LIME (green here) settles on a value different from the true Shapley value (black); KernelSHAP (blue) reaches it.</figcaption>
+        </figure>
     </div>
     <div class="folio"></div>
 </section>
@@ -508,13 +537,19 @@ button:focus-visible { outline: 3px solid var(--lime); outline-offset: 3px; }
         <div class="box eq">
             \[g(z')=\varphi_0+\sum_{j=1}^{M}\varphi_j z'_j,\qquad \varphi_j=\sum_{S\subseteq F\setminus\{j\}}\frac{|S|!\,(M-|S|-1)!}{M!}\Big[f_{S\cup\{j\}}-f_S\Big]\]
         </div>
-        <div class="stack" style="gap:24px">
-            <h3>Theorem 1: Shapley values are the only additive attribution with</h3>
-            <ul class="list big">
-                <li><b>Local accuracy:</b> \(g(x')=f(x)\)</li>
-                <li><b>Missingness:</b> a missing feature gets 0</li>
-                <li><b>Consistency:</b> if the model depends more on a feature, its SHAP value does not go down</li>
-            </ul>
+        <div class="cols c-wide-left">
+            <div class="stack" style="gap:24px">
+                <h3>Theorem 1: Shapley values are the only additive attribution with</h3>
+                <ul class="list big">
+                    <li><b>Local accuracy:</b> \(g(x')=f(x)\)</li>
+                    <li><b>Missingness:</b> a missing feature gets 0</li>
+                    <li><b>Consistency:</b> if the model depends more on a feature, its SHAP value does not go down</li>
+                </ul>
+            </div>
+            <figure class="pfig col">
+                <img src="img/shap_fig4a_human.png" alt="Lundberg and Lee Fig. 4A: humans and SHAP give fever and cough positive credit; LIME gives them negative credit" style="width:520px">
+                <figcaption>Lundberg &amp; Lee (2017), Fig. 4A. On a simple sickness score, SHAP matches the credit people give; LIME (green) does not.</figcaption>
+            </figure>
         </div>
     </div>
     <div class="folio"></div>
@@ -535,6 +570,10 @@ button:focus-visible { outline: 3px solid var(--lime); outline-offset: 3px; }
                 <li><b>Sum:</b> \(\varphi_0+\sum_j\varphi_j\) always equals \(f(x)\)</li>
             </ul>
         </div>
+        <figure class="pfig col">
+            <img src="img/shap_fig1_phi.png" alt="Lundberg and Lee Fig. 1: arrows phi_0 to phi_4 add up from the base value E[f(z)] to the output f(x)" style="width:1300px">
+            <figcaption style="max-width:1300px">Lundberg &amp; Lee (2017), Fig. 1. Starting from the base value \(E[f(z)]\), each \(\varphi_j\) moves the prediction up (blue) or down (red) until it reaches \(f(x)\).</figcaption>
+        </figure>
     </div>
     <div class="folio"></div>
 </section>
@@ -547,13 +586,19 @@ button:focus-visible { outline: 3px solid var(--lime); outline-offset: 3px; }
         <div class="box eq">
             \[g(z')=\varphi_0+\sum_{j=1}^{M}\varphi_j z'_j,\qquad \varphi_j=\sum_{S\subseteq F\setminus\{j\}}\frac{|S|!\,(M-|S|-1)!}{M!}\Big[f_{S\cup\{j\}}-f_S\Big]\]
         </div>
-        <div class="stack" style="gap:24px">
-            <h3>How SHAP connects to LIME</h3>
-            <ul class="list big">
-                <li>KernelSHAP is LIME with a specific kernel, loss and regulariser</li>
-                <li>LIME’s own heuristic choices can break local accuracy</li>
-                <li>KernelSHAP assumes independent features and depends on the background data</li>
-            </ul>
+        <div class="cols c-wide-left">
+            <div class="stack" style="gap:24px">
+                <h3>How SHAP connects to LIME</h3>
+                <ul class="list big">
+                    <li>KernelSHAP is LIME with a specific kernel, loss and regulariser</li>
+                    <li>LIME’s own heuristic choices can break local accuracy</li>
+                    <li>KernelSHAP assumes independent features and depends on the background data</li>
+                </ul>
+            </div>
+            <figure class="pfig col">
+                <img src="img/shap_fig2a_kernel.png" alt="Lundberg and Lee Fig. 2A: the Shapley kernel puts high weight on very small and very large subsets; LIME's kernels do not" style="width:500px">
+                <figcaption>Lundberg &amp; Lee (2017), Fig. 2A. The Shapley kernel gives the most weight to very small and very large coalitions; LIME’s kernel does not.</figcaption>
+            </figure>
         </div>
     </div>
     <div class="folio"></div>
@@ -1106,7 +1151,7 @@ button:focus-visible { outline: 3px solid var(--lime); outline-offset: 3px; }
      ========================================================= -->
 <section class="slide" data-section="Discussion">
     <aside class="rail"><ul class="outline"></ul>
-        <p class="source"><b>Source</b>Our analysis.</p></aside>
+        <p class="source"><b>Sources</b>Our analysis. Figure: Ribeiro et al. (2016), Fig. 11.</p></aside>
     <div class="body">
         <h2 class="headline">Feature importance tells us what the model looks at. It doesn’t tell us what causes cancer.</h2>
         <div class="cols c2" style="gap:56px 72px">
@@ -1115,6 +1160,10 @@ button:focus-visible { outline: 3px solid var(--lime); outline-offset: 3px; }
             <div class="takeaway"><h3>Model mistakes</h3><p>On the misclassified tumour, the features explain why the model was wrong. They don’t explain malignancy.</p></div>
             <div class="takeaway"><h3>No real intervention</h3><p>We only change numbers in the model’s input, not anything about a real tumour.</p></div>
         </div>
+        <figure class="pfig">
+            <img src="img/lime_fig11_husky.png" alt="Ribeiro et al. Fig. 11: a husky classified as wolf; LIME's explanation keeps only the snow in the background" style="height:300px">
+            <figcaption><b>Ribeiro et al. (2016), Fig. 11</b>A husky is called a wolf because of the snow. The explanation shows what the model uses, not what makes an animal a wolf.</figcaption>
+        </figure>
     </div>
     <div class="folio"></div>
 </section>
